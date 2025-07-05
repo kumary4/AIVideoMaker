@@ -28,7 +28,7 @@ class KlingAIService {
   constructor() {
     this.config = {
       apiKey: process.env.KLING_AI_API_KEY || '',
-      baseUrl: process.env.KLING_AI_BASE_URL || 'https://api.kling.ai/v1'
+      baseUrl: process.env.KLING_AI_BASE_URL || 'https://api-singapore.klingai.com'
     };
   }
 
@@ -40,19 +40,32 @@ class KlingAIService {
         return this.simulateVideoGeneration(request);
       }
 
-      // Make actual API call to Kling AI
-      const response = await fetch(`${this.config.baseUrl}/video/generate`, {
+      // Make actual API call to Kling AI using official format
+      const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          model_name: 'kling-v2-1', // Use latest V2.1 model
           prompt: request.prompt,
+          negative_prompt: '',
+          cfg_scale: 0.5,
+          mode: request.style === 'pro' ? 'pro' : 'std',
           duration: request.duration,
-          style: request.style,
           aspect_ratio: request.aspectRatio,
-          resolution: request.resolution || '1080p'
+          camera_control: {
+            type: 'simple',
+            config: {
+              horizontal: 0,
+              vertical: 0,
+              pan: 0,
+              tilt: 0,
+              roll: 0,
+              zoom: 0
+            }
+          }
         })
       });
 
@@ -81,7 +94,8 @@ class KlingAIService {
         return this.simulateTaskCompletion(taskId);
       }
 
-      const response = await fetch(`${this.config.baseUrl}/video/status/${taskId}`, {
+      const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video/${taskId}`, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`
         }

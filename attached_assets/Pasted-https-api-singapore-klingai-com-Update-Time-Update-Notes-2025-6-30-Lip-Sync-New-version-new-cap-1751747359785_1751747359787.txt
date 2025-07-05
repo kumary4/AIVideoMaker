@@ -1,0 +1,93 @@
+https://api-singapore.klingai.com.Update Time	Update Notes
+2025.6.30	● 【Lip-Sync】New version new capabilities
+	○ Supports increasing the maximum video duration from 10 seconds to 60 seconds
+	○ Generating videos takes as little as 2 minutes
+	○ No need to modify the code
+2025.6.19	● 【Video Generation】Support V2.1 model
+	○ Update image2video kling-v2-1 model, supports STD mode and PRO mode
+	○ Update image2video kling-v2-1-master model
+	○ Update text2video kling-v2-1-master model
+2025.6.6	【Image Generation】Support V2.0 Image-To-Image Model
+【Image Generation】V2.0 Text-To-Image model supports selecting resolutions (1K, 2K)
+【Image Generation】Support Image Expasion
+2025.5.13	【Image Generation】Support V2.0 model
+	○ Support kling-v2 text-to-image
+【Video Generation】Support V2.0 model
+	○ Support kling-v2 text-to-video and image-to-video
+	○ Kling-v2 currently does not support mode parameter
+【Multi-Image to Video】Newly launched
+	○ Supports selecting subjects from up to 4 images
+	○ Support custom generated video aspect ratios: 16:9, 9:16, 1:1
+2025.4.25	【Video Generation - Video Effects】New Feature: bloombloom & dizzydizzy (Single Image Effect)
+	○ Launch of "Single Image Effects": 2 types available, bloombloom, dizzydizzy
+	○ ncludes create task, query task (single), and query task (list) interfaces
+2025.3.31	【Video Generation】 V1.6 model supports generating videos from end frame
+	○ V1.6 model PRO mode can be used to generate video footage of the first few seconds of an image based on the image
+【Video Generation】 V1.5 and V1.6 models support video extension
+	○ Videos generated based on V1.5 and V1.6 models can be continued for 4-5 seconds after writing
+	○ If the video is generated using "last frame only", continue writing the content of the previous 4-5 seconds
+2025.3.25	【Image Generation】 V1.5 model supports character feature reference and character appearance reference
+	○ Selecting Face as reference: you can keep the face consistent with the reference image, and use prompt to change other components like the outfit and the background; great for single-character consistency across different looks
+	○ Selecting Subject as reference: you can set the entire subject as reference, and even fine-tune the reference level on the face and the subject; great for keeping the appearance of the character consistent across different scenes
+2025.3.18	【Video Generation - Video Effects】New Feature: fuzzyfuzzy（Single Image Effect）
+	○ Launch of "Single Image Effects": fuzzyfuzzy
+	○ Includes create task, query task (single), and query task (list) interfaces
+2025.3.12	【Video Generation - Video Effects】New Feature: Single Image Effect
+	○ Launch of "Single Image Effects": 2 types available, squish, expansion
+	○ Includes create task, query task (single), and query task (list) interfaces
+【Video Generation】New models supports start/end frame, end frame, motion brush, camera control
+	○ V1.5 Model PRO mode supports start/end frame, end frame, motion brush, camera control(simple only)
+	○ V1.6 Model PRO mode supports start/end frame
+【Video Generation】Lip-syncing supports customized videos and more available tones
+	○ Supports lip-syncing for any 1080p or 720p video within 10s
+	○ Added 8 new Chinese and English tones that can be used directly to dub lip-sync videos
+【Image Generation】 Support V1.5 model
+	○ Improved aesthetics: better composition and lighting, especially more aesthetically pleasing in portraits
+	○ Improved image quality: enhanced fidelity in details, more natural rendering, and stronger tonal contrast
+	○ Support 21:9 aspect ratio
+2025.3.5	【Video Generation】New Feature: Creative Video Effects
+	○ Launch of "Dual-character Effects": 3 types available, "hug", "kiss", and "heart_gesture".
+	○ Includes create task, query task (single), and query task (list) interfaces
+Compared to the general video generation API, the video effects API provides more flexible calling parameters and integrates pre- and post-processing functionalities tailored for special effects (e.g., dual-character effects). For example, it allows users to input two portrait images, automatically stitches them into a single composite image, and generates the video using the stitched image. This makes the API more flexible and efficient.
+2025.2.14	【Image Generation】The "model" field has been changed to "model_name"
+Please note that in order to maintain naming consistency, the original model field has been changed to model_name, so in the future, please use this field to specify the version of the model that needs to be called.
+● At the same time, we keep the behavior forward-compatible, if you continue to use the original model field, it will not have any impact on the interface call, there will not be any exception, which is equivalent to the default behavior when model_name is empty (i.e., call the V1 model).
+2025.1.7	【Video Generation】V1.6 Model Officially Launched
+● Supports text-to-video STD mode, image-to-video STD mode, and image-to-video PRO mode
+● Currently does not support tail frame, motion brushes, camera control, and other control features
+Please note that in order to maintain naming consistency, the original model field has been changed to model_name, so in the future, please use this field to specify the version of the model that needs to be called.
+● At the same time, we keep the behavior forward-compatible, if you continue to use the original model field, it will not have any impact on the interface call, there will not be any exception, which is equivalent to the default behavior when model_name is empty (i.e., call the V1 model).
+2024.12.30	【Virtual Try-On】New V1.5 model
+● V1.5 model is a comprehensive upgrade of V1.0 model
+● V1.5 model supports single clothing (upper, lower, and dress dress) try-on, as well as "upper + lower" combination try-on
+2024.12.23	【Video Generation】 New Feature: Lip-Sync
+● Videos generated by the Kling V1.0 model and Kling V1.5 model support lip-sync as long as the video meets the facial requirements
+● Includes create task, query task (single), and query task (list) interfaces
+2024.12.9	【Video Generation】Kling V1.5 Std Model Now Open for Video Generation: Image-to-Video Functionality Enabled, Text-to-Video Unsupported
+● Supports standard mode
+● Tail frame control is not supported
+● All other parameters are supported
+Please note that in order to maintain naming consistency, the original model field has been changed to model_name, so in the future, please use this field to specify the version of the model that needs to be called.
+● At the same time, we keep the behavior forward-compatible, if you continue to use the original model field, it will not have any impact on the interface call, there will not be any exception, which is equivalent to the default behavior when model_name is empty (i.e., call the V1 model).
+2024.12.2	【Video Generation】Capability Map
+● With multiple versions of the video generation model (V1, V1.5) and various plugin capabilities (e.g., camera control, start/end frame, motion brush, video extension, etc.), we have created a "Capability Map" to make it easier for everyone to visually check the availability of different versions and features. For details, please refer to the "3-0 Capability Map."
+2024.11.29	【Video Generation - ImageToVideo】New Feature: Motion Brush
+● This feature is only supported in Standard Mode 5s and Professional Mode 5s for the V1.0 model, and is currently not available for the V1.5 model.
+2024.11.15	【Video Generation】Kling V1.5 Pro Model Now Open for Video Generation: Image-to-Video Functionality Enabled, Text-to-Video Unsupported
+● Only supports professional mode
+● Tail frame control is not supported
+● All other parameters are supported
+【Video Generation】 New Feature: Video Extension
+● Supports extending videos generated by the V1.0 model directly, adding 4-5 seconds of video length per extension
+● Includes create task, query task (single), and query task (list) interfaces
+【Video Generation】Other Updates
+●  Added "external_task_id" field, allowing you to customize a task ID when creating a task, and query the video using this custom ID when needed
+Please note that in order to maintain naming consistency, the original model field has been changed to model_name, so in the future, please use this field to specify the version of the model that needs to be called.
+● At the same time, we keep the behavior forward-compatible, if you continue to use the original model field, it will not have any impact on the interface call, there will not be any exception, which is equivalent to the default behavior when model_name is empty (i.e., call the V1 model).
+2024.10.30	Added the "Query Resource Package List and Remaining Quantity" interface for your convenience. See "Section VI: Account Information Query".
+2024.10.25	To clarify the storage duration of model-generated content (images/videos): 
+● To ensure information security, generated images/videos will be cleared after 30 days. Please make sure to save them promptly.
+2024.10.15	Add a sample Java code for generating the API_Token.
+2024.9.19	Video Generation
+● When creating a task, the character limit for the prompt and negative_prompt in the request parameters has been updated to: cannot exceed 2500 characters.
+2024.9.19	Officially supporting the "AI Virtual Try-on" related API (kolors-virtual-try-on).
