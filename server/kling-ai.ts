@@ -44,7 +44,7 @@ class KlingAIService {
       const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Authorization': `Token ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -70,7 +70,14 @@ class KlingAIService {
       });
 
       if (!response.ok) {
-        throw new Error(`Kling AI API error: ${response.status} ${response.statusText}`);
+        const errorText = await response.text().catch(() => 'No error details available');
+        console.error(`Kling AI API error details:`, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: errorText
+        });
+        throw new Error(`Kling AI API error: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -97,7 +104,7 @@ class KlingAIService {
       const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video/${taskId}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`
+          'Authorization': `Token ${this.config.apiKey}`
         }
       });
 
