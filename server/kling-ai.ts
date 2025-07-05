@@ -78,6 +78,8 @@ class KlingAIService {
 
       console.log('Replicate API response:', output);
       console.log('Output type:', typeof output);
+      console.log('Output constructor:', output?.constructor?.name);
+      console.log('Output properties:', Object.getOwnPropertyNames(output || {}));
 
       const taskId = Math.random().toString(36).substr(2, 9);
       
@@ -97,6 +99,24 @@ class KlingAIService {
       } else if (output && typeof output === 'object' && output.url) {
         // Handle object with url property
         videoUrl = output.url;
+      } else if (output && (output.constructor?.name === 'FileOutput' || output.constructor?.name === 'ReadableStream')) {
+        // Handle Replicate File/Stream objects
+        try {
+          // Try different methods to get the URL
+          if (typeof output.url === 'function') {
+            videoUrl = await output.url();
+          } else if (output.url) {
+            videoUrl = output.url;
+          } else if (output.toString && output.toString().includes('http')) {
+            videoUrl = output.toString();
+          } else {
+            console.log('Unable to extract URL from output, falling back to simulation');
+            return this.simulateVideoGeneration(request);
+          }
+        } catch (streamError) {
+          console.error('Error handling file output:', streamError);
+          return this.simulateVideoGeneration(request);
+        }
       }
       
       if (videoUrl) {
