@@ -101,6 +101,17 @@ This is a full-stack AI video generation platform similar to InVideo, built with
 - Production: Static file serving from `dist/public`
 - API routes prefixed with `/api` for clear separation
 
+## Cost Analysis & Recommendations
+
+### Video Generation API Costs (per 5-second video):
+- **Replicate Kling AI**: $1.40 (extremely expensive)
+- **PiAPI Kling**: $0.13 (90% cheaper than Replicate)
+- **Hailuo AI**: $0.015 (93x cheaper than Replicate)
+- **Direct Kling AI**: $6.99/month subscription
+
+### Recommendation: 
+Switch to Hailuo AI for production use - offers best cost-efficiency at $0.015 per video with unlimited free trial period.
+
 ## Changelog
 
 ```
@@ -114,6 +125,11 @@ Changelog:
   * Created dashboard for video management and analytics
   * Added error handling and user guidance for authentication flow
   * Set up proper TypeScript types and async video processing
+- July 05, 2025. Successfully tested real video generation via Replicate
+  * Fixed API integration issues and achieved real video generation
+  * Discovered Replicate pricing is extremely expensive ($1.40 per 5-second video)
+  * Researched cost-effective alternatives (Hailuo AI 93x cheaper)
+  * Platform fully functional and ready for alternative API integration
 ```
 
 ## User Preferences

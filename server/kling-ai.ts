@@ -3,7 +3,8 @@
 import Replicate from 'replicate';
 
 interface KlingAIConfig {
-  replicateApiToken: string;
+  replicateApiToken?: string;
+  piApiKey?: string;
 }
 
 interface VideoGenerationRequest {
@@ -90,6 +91,12 @@ class KlingAIService {
         if (typeof firstOutput === 'string' && firstOutput.includes('http')) {
           videoUrl = firstOutput;
         }
+      } else if (output && typeof output.url === 'function') {
+        // Handle Replicate File objects
+        videoUrl = output.url();
+      } else if (output && typeof output === 'object' && output.url) {
+        // Handle object with url property
+        videoUrl = output.url;
       }
       
       if (videoUrl) {
