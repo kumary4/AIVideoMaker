@@ -47,7 +47,7 @@ export const loginSchema = z.object({
 
 export const videoGenerationSchema = z.object({
   prompt: z.string().min(10).max(1000),
-  duration: z.number().min(15).max(180),
+  duration: z.number().min(5).max(10), // Kling AI supports 5 or 10 seconds
   style: z.string(),
   aspectRatio: z.string(),
 });
