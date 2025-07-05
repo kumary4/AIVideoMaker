@@ -69,24 +69,9 @@ class KlingAIService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model_name: 'kling-v2-1', // Use latest V2.1 model
           prompt: request.prompt,
-          negative_prompt: '',
-          cfg_scale: 0.5,
-          mode: request.style === 'pro' ? 'pro' : 'std',
-          duration: request.duration <= 5 ? 5 : 10, // Kling AI supports 5 or 10 seconds
-          aspect_ratio: request.aspectRatio,
-          camera_control: {
-            type: 'simple',
-            config: {
-              horizontal: 0,
-              vertical: 0,
-              pan: 0,
-              tilt: 0,
-              roll: 0,
-              zoom: 0
-            }
-          }
+          duration: request.duration,
+          aspect_ratio: request.aspectRatio
         })
       });
 

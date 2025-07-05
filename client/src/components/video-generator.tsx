@@ -14,7 +14,7 @@ interface VideoGeneratorProps {
 
 export default function VideoGenerator({ onGenerate, isLoading }: VideoGeneratorProps) {
   const [prompt, setPrompt] = useState("");
-  const [duration, setDuration] = useState(30);
+  const [duration, setDuration] = useState(5);
   const [style, setStyle] = useState("cinematic");
   const [aspectRatio, setAspectRatio] = useState("16:9");
 
@@ -35,7 +35,7 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
     });
   };
 
-  const creditsNeeded = Math.ceil(duration / 30);
+  const creditsNeeded = duration <= 5 ? 1 : 2; // 1 credit for 5s, 2 credits for 10s
 
   return (
     <div className="max-w-4xl mx-auto mb-12">
@@ -75,12 +75,8 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="15">15 seconds</SelectItem>
-                    <SelectItem value="30">30 seconds</SelectItem>
-                    <SelectItem value="60">60 seconds</SelectItem>
-                    <SelectItem value="90">90 seconds</SelectItem>
-                    <SelectItem value="120">2 minutes</SelectItem>
-                    <SelectItem value="180">3 minutes</SelectItem>
+                    <SelectItem value="5">5 seconds</SelectItem>
+                    <SelectItem value="10">10 seconds</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
