@@ -74,7 +74,7 @@ class KlingAIService {
           negative_prompt: '',
           cfg_scale: 0.5,
           mode: request.style === 'pro' ? 'pro' : 'std',
-          duration: request.duration,
+          duration: request.duration <= 5 ? 5 : 10, // Kling AI supports 5 or 10 seconds
           aspect_ratio: request.aspectRatio,
           camera_control: {
             type: 'simple',
@@ -98,6 +98,12 @@ class KlingAIService {
           headers: Object.fromEntries(response.headers.entries()),
           body: errorText
         });
+        
+        // Provide helpful error messages for common issues
+        if (errorText.includes('duration value') && errorText.includes('invalid')) {
+          console.log('Note: Kling AI supports 5 or 10 second durations. Adjusting duration in request.');
+        }
+        
         throw new Error(`Kling AI API error: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
