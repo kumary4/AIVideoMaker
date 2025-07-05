@@ -62,16 +62,18 @@ class KlingAIService {
       const jwtToken = this.generateJWTToken();
       
       // Make actual API call to Kling AI using official format
-      const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video`, {
+      const response = await fetch(`${this.config.baseUrl}/v1/videos/generations`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${jwtToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          model: 'kling-v2-1-master', // Use Master model for text-to-video
           prompt: request.prompt,
           duration: request.duration,
-          aspect_ratio: request.aspectRatio
+          aspect_ratio: request.aspectRatio,
+          mode: 'std'
         })
       });
 
@@ -115,7 +117,7 @@ class KlingAIService {
 
       const jwtToken = this.generateJWTToken();
       
-      const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video/${taskId}`, {
+      const response = await fetch(`${this.config.baseUrl}/v1/videos/generations/${taskId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${jwtToken}`
