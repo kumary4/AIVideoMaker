@@ -18,7 +18,7 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
   const [style, setStyle] = useState("cinematic");
   const [aspectRatio, setAspectRatio] = useState("16:9");
 
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<any>({
     queryKey: ['/api/me'],
     retry: false,
   });
@@ -125,7 +125,7 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 text-white py-4 px-8 rounded-xl font-semibold text-lg transition-opacity"
-              disabled={isLoading || !prompt.trim() || (user && user.credits < creditsNeeded)}
+              disabled={isLoading || !prompt.trim() || (user && user?.credits < creditsNeeded)}
             >
               {isLoading ? (
                 <>
@@ -140,16 +140,21 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
               )}
             </Button>
 
-            {user && user.credits < creditsNeeded && (
+            {user && user?.credits < creditsNeeded && (
               <p className="text-sm text-red-600 text-center">
-                Insufficient credits. You need {creditsNeeded} credits but only have {user.credits}.
+                Insufficient credits. You need {creditsNeeded} credits but only have {user?.credits}.
               </p>
             )}
 
             {!user && (
-              <p className="text-sm text-gray-600 text-center">
-                Sign up to start generating videos with AI!
-              </p>
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-4">
+                  Sign up to start generating videos with AI!
+                </p>
+                <p className="text-xs text-gray-500">
+                  Create a free account to get 5 credits and start making videos
+                </p>
+              </div>
             )}
           </form>
         </CardContent>

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, loginSchema, videoGenerationSchema } from "@shared/schema";
+import { klingAI } from "./kling-ai";
 import Stripe from "stripe";
 import bcrypt from "bcrypt";
 import session from "express-session";
@@ -30,33 +31,70 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16",
 });
 
-// Kling AI API integration
+// Enhanced Kling AI integration with proper error handling
 async function generateVideoWithKlingAI(video: any, videoData: any) {
-  // This is a placeholder for Kling AI integration
-  // In production, you would integrate with the actual Kling AI API
-  // For now, we'll simulate the process
-  
-  setTimeout(async () => {
-    try {
-      // Simulate API call to Kling AI
-      const mockVideoUrl = `https://example.com/generated-video-${video.id}.mp4`;
-      const mockThumbnailUrl = `https://example.com/thumbnail-${video.id}.jpg`;
-      
-      await storage.updateVideoStatus(video.id, "completed", mockVideoUrl);
-      
-      // In production, you would:
-      // 1. Make HTTP request to Kling AI API with video parameters
-      // 2. Poll for completion status
-      // 3. Download the generated video
-      // 4. Upload to your storage (AWS S3, etc.)
-      // 5. Update the video record with the final URL
-      
-      console.log(`Video ${video.id} generated successfully with Kling AI`);
-    } catch (error) {
-      console.error('Kling AI generation failed:', error);
-      await storage.updateVideoStatus(video.id, "failed");
+  try {
+    console.log(`Starting video generation for video ID ${video.id}`);
+    
+    // Call Kling AI service
+    const response = await klingAI.generateVideo({
+      prompt: videoData.prompt,
+      duration: videoData.duration,
+      style: videoData.style,
+      aspectRatio: videoData.aspectRatio
+    });
+
+    if (response.status === 'completed') {
+      // Video completed immediately (unlikely but possible)
+      await storage.updateVideoStatus(video.id, "completed", response.videoUrl);
+      console.log(`Video ${video.id} completed immediately`);
+    } else if (response.status === 'processing') {
+      // Start polling for completion
+      pollVideoCompletion(video.id, response.taskId);
+    } else {
+      throw new Error(`Unexpected status: ${response.status}`);
     }
-  }, 10000); // 10 second simulation
+    
+  } catch (error) {
+    console.error(`Kling AI generation failed for video ${video.id}:`, error);
+    await storage.updateVideoStatus(video.id, "failed");
+  }
+}
+
+// Poll for video completion status
+async function pollVideoCompletion(videoId: number, taskId: string) {
+  const maxPollingTime = 300000; // 5 minutes
+  const pollingInterval = 10000; // 10 seconds
+  const startTime = Date.now();
+
+  const poll = async () => {
+    try {
+      if (Date.now() - startTime > maxPollingTime) {
+        console.log(`Polling timeout for video ${videoId}`);
+        await storage.updateVideoStatus(videoId, "failed");
+        return;
+      }
+
+      const status = await klingAI.checkTaskStatus(taskId);
+      
+      if (status.status === 'completed') {
+        await storage.updateVideoStatus(videoId, "completed", status.videoUrl);
+        console.log(`Video ${videoId} completed successfully`);
+      } else if (status.status === 'failed') {
+        await storage.updateVideoStatus(videoId, "failed");
+        console.log(`Video ${videoId} generation failed`);
+      } else {
+        // Continue polling
+        setTimeout(poll, pollingInterval);
+      }
+    } catch (error) {
+      console.error(`Polling error for video ${videoId}:`, error);
+      await storage.updateVideoStatus(videoId, "failed");
+    }
+  };
+
+  // Start polling after initial delay
+  setTimeout(poll, pollingInterval);
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {

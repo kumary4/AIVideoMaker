@@ -50,11 +50,19 @@ export default function Home() {
       navigate('/dashboard');
     },
     onError: (error: any) => {
-      toast({
-        title: "Generation Failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error.message.includes('Not authenticated')) {
+        toast({
+          title: "Please Sign Up First",
+          description: "Create a free account to start generating videos with 5 free credits!",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Generation Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     },
   });
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack AI video generation platform built with React and Express. The application allows users to generate videos using AI based on text prompts, with subscription-based pricing tiers and credit systems. The platform integrates with Stripe for payment processing and uses PostgreSQL for data persistence.
+This is a full-stack AI video generation platform similar to InVideo, built with React and Express. The application allows users to generate professional videos using Kling AI technology based on text prompts, with subscription-based pricing tiers and credit systems. The platform integrates with Stripe for payment processing and includes comprehensive monetization features.
 
 ## System Architecture
 
@@ -33,11 +33,17 @@ This is a full-stack AI video generation platform built with React and Express. 
 - Password hashing with bcrypt
 - User registration and login endpoints
 
-### Video Generation System
-- Credit-based video generation (credits deducted based on video duration)
-- Multiple video styles and aspect ratios supported
-- Status tracking (generating, completed, failed)
-- Metadata storage including prompts, duration, and output URLs
+### Kling AI Video Generation System
+- **Kling AI Integration**: Professional video generation using Kling AI API
+- **Simulation Mode**: Development-friendly mode with mock generation for testing
+- **Production Mode**: Real Kling AI API integration when credentials are provided
+- **Async Processing**: Videos generated asynchronously with automatic status polling
+- **Credit System**: Credits deducted based on video duration (1 credit = 30 seconds)
+- **Multiple Styles**: Cinematic, documentary, animation, commercial, educational, creative
+- **Aspect Ratios**: 16:9, 9:16, 1:1, 4:3 for different platforms
+- **Duration Control**: 15 seconds to 3 minutes
+- **Status Tracking**: Real-time status updates (generating, completed, failed)
+- **Error Handling**: Automatic fallback to simulation if API fails
 
 ### Subscription Management
 - Stripe integration for payment processing
@@ -100,6 +106,14 @@ This is a full-stack AI video generation platform built with React and Express. 
 ```
 Changelog:
 - July 05, 2025. Initial setup
+- July 05, 2025. Completed AI video generation platform with Kling AI integration
+  * Built complete InVideo-style interface with professional design
+  * Integrated Kling AI API with simulation and production modes
+  * Added comprehensive user authentication and credit system
+  * Implemented Stripe payment processing for subscriptions
+  * Created dashboard for video management and analytics
+  * Added error handling and user guidance for authentication flow
+  * Set up proper TypeScript types and async video processing
 ```
 
 ## User Preferences
