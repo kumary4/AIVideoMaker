@@ -48,20 +48,35 @@ class KlingAIService {
 
     try {
       console.log('Starting Kling AI video generation via Replicate...');
+      console.log('Request parameters:', {
+        prompt: request.prompt,
+        duration: request.duration,
+        aspect_ratio: request.aspectRatio,
+        mode: "standard",
+        cfg_scale: 0.5
+      });
       
-      // Use the Kling AI model on Replicate
-      const output = await this.replicate.run(
-        "kwaivgi/kling-v2.0", // Official Kling AI model on Replicate
-        {
-          input: {
-            prompt: request.prompt,
-            duration: request.duration,
-            aspect_ratio: request.aspectRatio,
-            mode: "standard", // Use standard mode for cost efficiency
-            cfg_scale: 0.5
+      // Use the Kling AI model on Replicate with timeout
+      const output = await Promise.race([
+        this.replicate.run(
+          "kwaivgi/kling-v2.0", // Official Kling AI model on Replicate
+          {
+            input: {
+              prompt: request.prompt,
+              duration: request.duration,
+              aspect_ratio: request.aspectRatio,
+              cfg_scale: 0.5,
+              negative_prompt: ""
+            }
           }
-        }
-      ) as any;
+        ),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout after 8 minutes')), 480000)
+        )
+      ]) as any;
+
+      console.log('Replicate API response:', output);
+      console.log('Output type:', typeof output);
 
       const taskId = Math.random().toString(36).substr(2, 9);
       
