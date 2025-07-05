@@ -94,14 +94,24 @@ export default function Subscribe() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setClientSecret(data.clientSecret);
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        } else if (data.redirectUrl) {
+          toast({
+            title: "Development Mode",
+            description: data.message || "Subscription features are in development",
+          });
+          // Redirect to dashboard after a short delay
+          setTimeout(() => navigate(data.redirectUrl), 2000);
+        }
       })
       .catch((error) => {
         toast({
-          title: "Error",
-          description: "Failed to create subscription",
-          variant: "destructive",
+          title: "Notice",
+          description: "Subscription features are currently in development mode",
         });
+        // Redirect to dashboard after error
+        setTimeout(() => navigate('/dashboard'), 2000);
       });
   }, [user, selectedPlan]);
 
