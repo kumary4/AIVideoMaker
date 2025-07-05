@@ -161,10 +161,11 @@ export default function Header() {
                     </DialogHeader>
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div>
-                        <Label htmlFor="username">Username</Label>
+                        <Label htmlFor="username">Username or Email</Label>
                         <Input
                           id="username"
                           type="text"
+                          placeholder="Enter your username or email"
                           value={loginData.username}
                           onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
                           required

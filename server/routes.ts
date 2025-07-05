@@ -109,15 +109,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Passport configuration
+  // Passport configuration - support both username and email login
   passport.use(new LocalStrategy(
     {
       usernameField: 'username',
       passwordField: 'password'
     },
-    async (username, password, done) => {
+    async (usernameOrEmail, password, done) => {
       try {
-        const user = await storage.getUserByUsername(username);
+        // Try to find user by username first, then by email
+        let user = await storage.getUserByUsername(usernameOrEmail);
+        if (!user) {
+          user = await storage.getUserByEmail(usernameOrEmail);
+        }
+        
         if (!user) {
           return done(null, false, { message: 'User not found' });
         }
@@ -176,10 +181,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/login", passport.authenticate('local'), (req, res) => {
-    const user = req.user!;
-    const { password, ...userWithoutPassword } = user as any;
-    res.json(userWithoutPassword);
+  app.post("/api/login", (req, res, next) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ message: "Internal server error" });
+      }
+      if (!user) {
+        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "Login failed" });
+        }
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+      });
+    })(req, res, next);
   });
 
   app.post("/api/logout", (req, res) => {
