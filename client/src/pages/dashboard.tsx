@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
 import Header from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,16 +10,63 @@ import { Video, Clock, TrendingUp, Download, Eye, RefreshCw } from "lucide-react
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
+  const [generatingTimer, setGeneratingTimer] = useState<{ [key: number]: number }>({});
 
   const { data: user } = useQuery({
     queryKey: ['/api/me'],
     retry: false,
   });
 
-  const { data: videos, isLoading } = useQuery({
+  const { data: videos, isLoading, refetch } = useQuery({
     queryKey: ['/api/videos'],
     enabled: !!user,
+    refetchInterval: 5000, // Refetch every 5 seconds to get status updates
   });
+
+  // Timer effect for generating videos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGeneratingTimer(prev => {
+        const newTimer = { ...prev };
+        Object.keys(newTimer).forEach(key => {
+          newTimer[parseInt(key)] = newTimer[parseInt(key)] + 1;
+        });
+        return newTimer;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Track generating videos
+  useEffect(() => {
+    if (videos) {
+      const generating = videos.filter((video: any) => video.status === 'generating');
+      const newTimer = { ...generatingTimer };
+      
+      generating.forEach((video: any) => {
+        if (!(video.id in newTimer)) {
+          newTimer[video.id] = 0;
+        }
+      });
+      
+      // Remove completed videos from timer
+      Object.keys(newTimer).forEach(key => {
+        const video = videos.find((v: any) => v.id === parseInt(key));
+        if (!video || video.status !== 'generating') {
+          delete newTimer[parseInt(key)];
+        }
+      });
+      
+      setGeneratingTimer(newTimer);
+    }
+  }, [videos]);
+
+  const formatTimer = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   if (!user) {
     navigate('/');
@@ -161,14 +209,46 @@ export default function Dashboard() {
                       <Badge className={getStatusColor(video.status)}>
                         {video.status}
                       </Badge>
-                      {video.status === 'completed' && (
-                        <Button size="sm" variant="outline">
+                      {video.status === 'generating' && (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-mono text-gray-600">
+                            {formatTimer(generatingTimer[video.id] || 0)}
+                          </span>
+                          <RefreshCw className="w-4 h-4 animate-spin text-gray-400" />
+                        </div>
+                      )}
+                      {video.status === 'completed' && video.videoUrl && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              const response = await fetch(video.videoUrl);
+                              const blob = await response.blob();
+                              const url = window.URL.createObjectURL(blob);
+                              
+                              const link = document.createElement('a');
+                              link.href = url;
+                              link.download = `${video.title}.mp4`;
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                              
+                              window.URL.revokeObjectURL(url);
+                            } catch (error) {
+                              console.error('Download failed:', error);
+                              // Fallback to direct link
+                              const link = document.createElement('a');
+                              link.href = video.videoUrl;
+                              link.download = `${video.title}.mp4`;
+                              link.target = '_blank';
+                              link.click();
+                            }
+                          }}
+                        >
                           <Download className="w-4 h-4 mr-2" />
                           Download
                         </Button>
-                      )}
-                      {video.status === 'generating' && (
-                        <RefreshCw className="w-4 h-4 animate-spin text-gray-400" />
                       )}
                     </div>
                   </div>

@@ -142,12 +142,35 @@ export default function VideoPlayer({
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-gray-900 truncate">{title}</h3>
-          {onDownload && (
-            <Button variant="outline" size="sm" onClick={onDownload}>
-              <Download className="w-4 h-4 mr-2" />
-              Download
-            </Button>
-          )}
+          <Button variant="outline" size="sm" onClick={async () => {
+            try {
+              // Fetch the video and create a blob for download
+              const response = await fetch(videoUrl);
+              const blob = await response.blob();
+              const url = window.URL.createObjectURL(blob);
+              
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `${title}.mp4`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              // Clean up the blob URL
+              window.URL.revokeObjectURL(url);
+            } catch (error) {
+              console.error('Download failed:', error);
+              // Fallback to direct link
+              const link = document.createElement('a');
+              link.href = videoUrl;
+              link.download = `${title}.mp4`;
+              link.target = '_blank';
+              link.click();
+            }
+          }}>
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </Button>
         </div>
       </CardContent>
     </Card>
