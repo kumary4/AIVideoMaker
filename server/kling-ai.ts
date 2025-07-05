@@ -1,8 +1,10 @@
 // Kling AI API Integration
 // This module handles video generation using Kling AI's API
+import jwt from 'jsonwebtoken';
 
 interface KlingAIConfig {
-  apiKey: string;
+  accessKey: string;
+  secretKey: string;
   baseUrl: string;
 }
 
@@ -27,24 +29,43 @@ class KlingAIService {
 
   constructor() {
     this.config = {
-      apiKey: process.env.KLING_AI_API_KEY || '',
+      accessKey: process.env.KLING_AI_ACCESS_KEY || '',
+      secretKey: process.env.KLING_AI_SECRET_KEY || '',
       baseUrl: process.env.KLING_AI_BASE_URL || 'https://api-singapore.klingai.com'
     };
   }
 
+  private generateJWTToken(): string {
+    const now = Math.floor(Date.now() / 1000);
+    const payload = {
+      iss: this.config.accessKey, // Access key as issuer
+      exp: now + 1800, // Token expires in 30 minutes
+      nbf: now - 5     // Token is valid 5 seconds from now
+    };
+    
+    // Use the secret key to sign the JWT token
+    return jwt.sign(payload, this.config.secretKey, { 
+      algorithm: 'HS256',
+      header: { alg: 'HS256', typ: 'JWT' }
+    });
+  }
+
   async generateVideo(request: VideoGenerationRequest): Promise<KlingAIResponse> {
     try {
-      // Check if API key is configured
-      if (!this.config.apiKey) {
-        console.warn('Kling AI API key not configured, using simulation mode');
+      // Check if API keys are configured
+      if (!this.config.accessKey || !this.config.secretKey) {
+        console.warn('Kling AI API keys not configured, using simulation mode');
         return this.simulateVideoGeneration(request);
       }
 
+      // Generate JWT token for authentication
+      const jwtToken = this.generateJWTToken();
+      
       // Make actual API call to Kling AI using official format
       const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video`, {
         method: 'POST',
         headers: {
-          'Authorization': `Token ${this.config.apiKey}`,
+          'Authorization': `Bearer ${jwtToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -97,14 +118,16 @@ class KlingAIService {
 
   async checkTaskStatus(taskId: string): Promise<KlingAIResponse> {
     try {
-      if (!this.config.apiKey) {
+      if (!this.config.accessKey || !this.config.secretKey) {
         return this.simulateTaskCompletion(taskId);
       }
 
+      const jwtToken = this.generateJWTToken();
+      
       const response = await fetch(`${this.config.baseUrl}/v1/videos/text2video/${taskId}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Token ${this.config.apiKey}`
+          'Authorization': `Bearer ${jwtToken}`
         }
       });
 
@@ -151,7 +174,7 @@ class KlingAIService {
   }
 
   isConfigured(): boolean {
-    return !!this.config.apiKey;
+    return !!(this.config.accessKey && this.config.secretKey);
   }
 }
 
