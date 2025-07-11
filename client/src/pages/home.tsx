@@ -278,6 +278,25 @@ export default function Home() {
                             }
                           }}
                         />
+                      ) : generatedVideo.status === 'failed' ? (
+                        <div className="text-center py-16">
+                          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                            <Video className="w-8 h-8 text-red-600" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Video Generation Failed</h3>
+                          <p className="text-gray-600 mb-4">
+                            {generatedVideo.title || "Your video"} failed to generate.
+                          </p>
+                          <p className="text-sm text-gray-500 mb-4">
+                            The AI video service is temporarily unavailable. Please try again later.
+                          </p>
+                          <Button 
+                            onClick={() => setActiveTab("generate")} 
+                            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                          >
+                            Try Again
+                          </Button>
+                        </div>
                       ) : (
                         <div className="text-center py-16">
                           <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
