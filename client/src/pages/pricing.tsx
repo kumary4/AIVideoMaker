@@ -16,32 +16,44 @@ export default function Pricing() {
     setIsLoading(planType);
     
     try {
-      let response;
       if (planType === 'one-time') {
         // Redirect to existing checkout for one-time purchase
         navigate("/checkout");
         return;
       } else {
         // Create subscription
-        response = await apiRequest("POST", "/api/create-subscription", {
+        console.log('Creating subscription for plan:', planType);
+        
+        const response = await apiRequest("POST", "/api/create-subscription", {
           planType
         });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to create subscription");
+        }
+        
         const data = await response.json();
+        console.log('Subscription response:', data);
         
         if (data.subscriptionUrl) {
+          console.log('Redirecting to Stripe checkout:', data.subscriptionUrl);
+          // Clear loading state before redirect
+          setIsLoading(null);
+          // Use window.location.href for full redirect
           window.location.href = data.subscriptionUrl;
         } else {
-          throw new Error("Failed to create subscription");
+          throw new Error("No subscription URL returned");
         }
       }
     } catch (error: any) {
+      console.error('Subscription error:', error);
+      setIsLoading(null);
       toast({
         title: "Error",
         description: error.message || "Failed to start subscription process",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(null);
     }
   };
 
