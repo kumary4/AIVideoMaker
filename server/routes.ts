@@ -352,23 +352,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { planType } = req.body;
       
       if (planType === 'test-monthly') {
-        // Create a simple $1 one-time payment instead of subscription for testing
+        // First, get the product to find its price
+        const product = await stripe.products.retrieve('prod_Sf8piUnhOUMOw5');
+        
+        // Get the prices for this product
+        const prices = await stripe.prices.list({
+          product: 'prod_Sf8piUnhOUMOw5',
+          active: true
+        });
+        
+        if (prices.data.length === 0) {
+          throw new Error('No active prices found for product');
+        }
+        
+        // Use the first active price
+        const price = prices.data[0];
+        
+        // Create subscription checkout session
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
           line_items: [
             {
-              price_data: {
-                currency: 'usd',
-                product_data: {
-                  name: 'Test Plan - 1 Credit',
-                  description: '1 video generation credit (TEST ONLY)',
-                },
-                unit_amount: 100, // $1.00 in cents
-              },
+              price: price.id,
               quantity: 1,
             },
           ],
-          mode: 'payment',
+          mode: 'subscription',
           success_url: `${req.protocol}://${req.get('host')}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
           metadata: {

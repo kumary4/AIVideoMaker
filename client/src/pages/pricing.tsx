@@ -79,22 +79,23 @@ export default function Pricing() {
     },
     {
       id: "test-monthly",
-      name: "Test Plan",
+      name: "Test Monthly",
       price: "$1",
-      period: "one-time",
+      period: "per month",
       credits: 1,
       features: [
-        "1 video generation credit",
+        "1 video generation credit monthly",
         "Up to 10 seconds per video",
         "HD quality output",
         "All video styles",
         "Download & share videos",
-        "Email support"
+        "Email support",
+        "Cancel anytime"
       ],
-      buttonText: "Buy Test Credit",
+      buttonText: "Start Test Plan",
       buttonVariant: "default" as const,
       popular: true,
-      description: "Testing payment - will be removed later",
+      description: "Testing subscription - will be removed later",
       badge: "TEST ONLY"
     }
   ];
