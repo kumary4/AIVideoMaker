@@ -92,10 +92,10 @@ export default function SubscriptionSuccess() {
           <p className="text-gray-600">Create your account to access your monthly credits</p>
           <div className="bg-purple-50 rounded-lg p-3 mt-4">
             <p className="text-sm font-medium text-purple-900">
-              🎉 Test Monthly Plan Active
+              🎉 Test Payment Successful
             </p>
             <p className="text-xs text-purple-700 mt-1">
-              $1/month • 1 credit per month
+              $1 • 1 video generation credit
             </p>
           </div>
         </CardHeader>

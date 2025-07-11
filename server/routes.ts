@@ -352,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { planType } = req.body;
       
       if (planType === 'test-monthly') {
-        // Create a $1/month subscription using dynamic pricing
+        // Create a simple $1 one-time payment instead of subscription for testing
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
           line_items: [
@@ -360,28 +360,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
               price_data: {
                 currency: 'usd',
                 product_data: {
-                  name: 'Test Monthly Plan',
-                  description: '1 video generation credit per month (TEST ONLY)',
+                  name: 'Test Plan - 1 Credit',
+                  description: '1 video generation credit (TEST ONLY)',
                 },
                 unit_amount: 100, // $1.00 in cents
-                recurring: {
-                  interval: 'month',
-                },
               },
               quantity: 1,
             },
           ],
-          mode: 'subscription',
+          mode: 'payment',
           success_url: `${req.protocol}://${req.get('host')}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
           metadata: {
             planType: 'test-monthly',
             credits: '1'
-          },
-          // Add customer email collection
-          customer_email: undefined,
-          // Enable tax calculation if needed
-          automatic_tax: { enabled: false },
+          }
         });
 
         console.log('Created Stripe session:', session.id);
