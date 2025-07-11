@@ -7,6 +7,8 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Subscribe from "@/pages/subscribe";
+import Checkout from "@/pages/checkout";
+import AuthSelection from "@/pages/auth-selection";
 
 function Router() {
   return (
@@ -14,6 +16,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/subscribe" component={Subscribe} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/auth-selection" component={AuthSelection} />
       <Route component={NotFound} />
     </Switch>
   );

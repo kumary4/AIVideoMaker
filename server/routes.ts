@@ -376,6 +376,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Payment intent creation for credit purchases
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { amount, credits, description } = req.body;
+      
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        description: description || `Purchase ${credits} video generation credits`,
+        metadata: {
+          credits: credits.toString(),
+          type: 'credit_purchase'
+        }
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: "Error creating payment intent: " + error.message 
+      });
+    }
+  });
+
+  // Route for registering user after successful payment
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Create user with 10 credits (purchased credits)
+      const user = await storage.createUser({
+        username: email, // Use email as username for simplicity
+        email,
+        password: hashedPassword,
+        credits: 10, // Grant purchased credits
+        subscription: "one_time"
+      });
+
+      // Log the user in automatically
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "Registration successful but login failed" });
+        }
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+      });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Stripe webhook for handling subscription updates
   app.post('/api/stripe-webhook', async (req, res) => {
     const event = req.body;

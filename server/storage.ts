@@ -52,10 +52,10 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id,
-      credits: 5,
-      subscription: "free",
-      stripeCustomerId: null,
-      stripeSubscriptionId: null,
+      credits: insertUser.credits || 0,
+      subscription: insertUser.subscription || "free",
+      stripeCustomerId: insertUser.stripeCustomerId || null,
+      stripeSubscriptionId: insertUser.stripeSubscriptionId || null,
       createdAt: new Date()
     };
     this.users.set(id, user);

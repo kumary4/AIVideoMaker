@@ -272,6 +272,7 @@ export default function Home() {
                         <VideoPlayer 
                           videoUrl={generatedVideo.videoUrl} 
                           title={generatedVideo.title || "Generated Video"}
+                          aspectRatio={generatedVideo.aspectRatio || "16:9"}
                           onDownload={() => {
                             if (generatedVideo.videoUrl) {
                               window.open(generatedVideo.videoUrl, '_blank');

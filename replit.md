@@ -137,6 +137,14 @@ Changelog:
   * Fixed download functionality with proper blob handling
   * Added real-time timer and automatic status updates
   * Improved user experience with better feedback and status tracking
+- July 11, 2025. Enhanced video player and implemented paid-only model
+  * Completely redesigned video player with professional UI matching reference image
+  * Added Kling AI watermark, improved controls, and enhanced info section
+  * Removed free 5-video credits - all users must pay before generating videos
+  * Implemented Stripe checkout flow with $5 for 10 credits
+  * Added post-payment authentication with email/password and Google (coming soon)
+  * Created seamless payment-to-account creation flow
+  * Updated user schema to start with 0 credits instead of 5 free credits
 ```
 
 ## User Preferences

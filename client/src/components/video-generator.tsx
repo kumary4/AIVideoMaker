@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Loader2 } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface VideoGeneratorProps {
   onGenerate: (data: any) => void;
@@ -17,6 +18,7 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
   const [duration, setDuration] = useState(5);
   const [style, setStyle] = useState("cinematic");
   const [aspectRatio, setAspectRatio] = useState("16:9");
+  const [, navigate] = useLocation();
 
   const { data: user } = useQuery<any>({
     queryKey: ['/api/me'],
@@ -26,6 +28,12 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt.trim()) return;
+
+    // If user is not authenticated, redirect to checkout
+    if (!user) {
+      navigate("/checkout");
+      return;
+    }
 
     onGenerate({
       prompt,
@@ -128,6 +136,11 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Generating Video...
                 </>
+              ) : !user ? (
+                <>
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Buy Credits & Generate Video
+                </>
               ) : (
                 <>
                   <Sparkles className="w-5 h-5 mr-2" />
@@ -145,10 +158,10 @@ export default function VideoGenerator({ onGenerate, isLoading }: VideoGenerator
             {!user && (
               <div className="text-center">
                 <p className="text-sm text-gray-600 mb-4">
-                  Sign up to start generating videos with AI!
+                  Purchase credits to start generating videos with AI!
                 </p>
                 <p className="text-xs text-gray-500">
-                  Create a free account to get 5 credits and start making videos
+                  Professional AI video generation starting at $0.50 per video
                 </p>
               </div>
             )}

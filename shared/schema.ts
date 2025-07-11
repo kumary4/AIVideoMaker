@@ -7,7 +7,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  credits: integer("credits").default(5).notNull(),
+  credits: integer("credits").default(0).notNull(),
   subscription: text("subscription").default("free").notNull(), // free, starter, pro, enterprise
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
@@ -31,8 +31,12 @@ export const videos = pgTable("videos", {
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
-  credits: true,
   createdAt: true,
+}).extend({
+  credits: z.number().optional(),
+  subscription: z.string().optional(),
+  stripeCustomerId: z.string().optional().nullable(),
+  stripeSubscriptionId: z.string().optional().nullable(),
 });
 
 export const insertVideoSchema = createInsertSchema(videos).omit({

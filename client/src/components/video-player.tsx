@@ -7,6 +7,7 @@ interface VideoPlayerProps {
   videoUrl: string;
   thumbnailUrl?: string;
   title: string;
+  aspectRatio?: string;
   onDownload?: () => void;
 }
 
@@ -14,6 +15,7 @@ export default function VideoPlayer({
   videoUrl, 
   thumbnailUrl, 
   title, 
+  aspectRatio,
   onDownload 
 }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -75,8 +77,9 @@ export default function VideoPlayer({
   };
 
   return (
-    <Card className="overflow-hidden shadow-lg">
-      <div className="relative bg-black group">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      {/* Video Container */}
+      <div className="relative bg-black group rounded-t-xl overflow-hidden">
         <video
           ref={videoRef}
           src={videoUrl}
@@ -87,92 +90,117 @@ export default function VideoPlayer({
           onEnded={() => setIsPlaying(false)}
         />
         
-        {/* Video Controls Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={togglePlay}
-              className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
-            >
-              {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
-            </Button>
-          </div>
+        {/* Main Play Button Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={togglePlay}
+            className="w-16 h-16 rounded-full bg-white/90 hover:bg-white text-gray-900 backdrop-blur-sm shadow-lg hover:scale-105 transition-all duration-200"
+          >
+            {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 ml-1" />}
+          </Button>
         </div>
         
-        {/* Progress Bar */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-          <div className="flex items-center space-x-3 text-white">
+        {/* Bottom Controls Bar */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4">
+          <div className="flex items-center space-x-3">
+            {/* Play/Pause Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={togglePlay}
-              className="text-white hover:bg-white/20 p-1"
+              className="text-white hover:bg-white/20 p-1.5 rounded-full"
             >
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
             
-            <div className="flex-1 flex items-center space-x-2">
-              <span className="text-xs">{formatTime(currentTime)}</span>
+            {/* Time Display */}
+            <span className="text-xs text-white/90 font-medium min-w-[2.5rem]">
+              {formatTime(currentTime)}
+            </span>
+            
+            {/* Progress Bar */}
+            <div
+              className="flex-1 h-1 bg-white/30 rounded-full cursor-pointer group/progress"
+              onClick={handleSeek}
+            >
               <div
-                className="flex-1 h-2 bg-white/30 rounded-full cursor-pointer"
-                onClick={handleSeek}
-              >
-                <div
-                  className="h-full bg-white rounded-full transition-all duration-200"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <span className="text-xs">{formatTime(duration)}</span>
+                className="h-full bg-white rounded-full transition-all duration-200 group-hover/progress:bg-purple-400"
+                style={{ width: `${progress}%` }}
+              />
             </div>
             
+            {/* Duration */}
+            <span className="text-xs text-white/90 font-medium min-w-[2.5rem]">
+              {formatTime(duration)}
+            </span>
+            
+            {/* Volume Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleMute}
-              className="text-white hover:bg-white/20 p-1"
+              className="text-white hover:bg-white/20 p-1.5 rounded-full"
             >
               {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </Button>
           </div>
         </div>
+        
+        {/* Kling AI Watermark */}
+        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1">
+          <span className="text-xs text-white/90 font-medium">Kling AI</span>
+        </div>
       </div>
       
-      <CardContent className="p-4">
+      {/* Video Info Section */}
+      <div className="p-4 bg-gray-50 border-t">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 truncate">{title}</h3>
-          <Button variant="outline" size="sm" onClick={async () => {
-            try {
-              // Fetch the video and create a blob for download
-              const response = await fetch(videoUrl);
-              const blob = await response.blob();
-              const url = window.URL.createObjectURL(blob);
-              
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = `${title}.mp4`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              // Clean up the blob URL
-              window.URL.revokeObjectURL(url);
-            } catch (error) {
-              console.error('Download failed:', error);
-              // Fallback to direct link
-              const link = document.createElement('a');
-              link.href = videoUrl;
-              link.download = `${title}.mp4`;
-              link.target = '_blank';
-              link.click();
-            }
-          }}>
+          <div className="flex-1 mr-4">
+            <h3 className="font-semibold text-gray-900 text-base leading-tight">
+              Video from "{title}"
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              {formatTime(duration)} • {aspectRatio || "16:9"}
+            </p>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={async () => {
+              try {
+                // Fetch the video and create a blob for download
+                const response = await fetch(videoUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${title}.mp4`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Clean up the blob URL
+                window.URL.revokeObjectURL(url);
+              } catch (error) {
+                console.error('Download failed:', error);
+                // Fallback to direct link
+                const link = document.createElement('a');
+                link.href = videoUrl;
+                link.download = `${title}.mp4`;
+                link.target = '_blank';
+                link.click();
+              }
+            }}
+            className="bg-white hover:bg-gray-50 border-gray-300 text-gray-700 hover:text-gray-900 font-medium"
+          >
             <Download className="w-4 h-4 mr-2" />
             Download
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
