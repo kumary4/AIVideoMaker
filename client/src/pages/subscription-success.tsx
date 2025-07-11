@@ -15,6 +15,7 @@ export default function SubscriptionSuccess() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionData, setSessionData] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -23,8 +24,21 @@ export default function SubscriptionSuccess() {
     const session = params.get('session_id');
     if (session) {
       setSessionId(session);
+      // Fetch session details
+      fetchSessionData(session);
     }
   }, []);
+
+  const fetchSessionData = async (sessionId: string) => {
+    try {
+      const response = await apiRequest("GET", `/api/subscription-session/${sessionId}`);
+      const data = await response.json();
+      setSessionData(data);
+      console.log('Session data:', data);
+    } catch (error) {
+      console.error('Error fetching session data:', error);
+    }
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +49,9 @@ export default function SubscriptionSuccess() {
         email, 
         password,
         subscription: "test-monthly",
-        credits: 1 
+        credits: 1,
+        stripeCustomerId: sessionData?.customer || null,
+        stripeSubscriptionId: sessionData?.subscription || null
       });
       const data = await response.json();
       

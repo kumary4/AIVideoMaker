@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, loginSchema, videoGenerationSchema } from "@shared/schema";
@@ -351,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { planType } = req.body;
       
       if (planType === 'test-monthly') {
-        // Create a $1/month subscription
+        // Create a $1/month subscription using dynamic pricing
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
           line_items: [
@@ -376,9 +377,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: {
             planType: 'test-monthly',
             credits: '1'
-          }
+          },
+          // Add customer email collection
+          customer_email: undefined,
+          // Enable tax calculation if needed
+          automatic_tax: { enabled: false },
         });
 
+        console.log('Created Stripe session:', session.id);
         res.json({
           subscriptionUrl: session.url
         });
@@ -390,6 +396,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "Error creating subscription: " + error.message 
       });
+    }
+  });
+
+  // Handle successful subscription completion
+  app.post('/api/subscription-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+      // You'll need to set this webhook secret in your Stripe dashboard
+      const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      if (endpointSecret) {
+        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      } else {
+        // For development, just parse the body
+        event = JSON.parse(req.body.toString());
+      }
+    } catch (err: any) {
+      console.error('Webhook signature verification failed:', err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object;
+        console.log('Subscription completed:', session.id);
+        
+        if (session.mode === 'subscription') {
+          // Handle subscription completion
+          const customerId = session.customer;
+          const subscriptionId = session.subscription;
+          
+          // You would typically save this to your database
+          console.log('New subscription:', {
+            customerId,
+            subscriptionId,
+            planType: session.metadata?.planType,
+            credits: session.metadata?.credits
+          });
+        }
+        break;
+      
+      case 'invoice.payment_succeeded':
+        // Handle recurring payment
+        const invoice = event.data.object;
+        console.log('Monthly payment succeeded:', invoice.id);
+        break;
+        
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    res.json({ received: true });
+  });
+
+  // Get subscription session details
+  app.get('/api/subscription-session/:session_id', async (req, res) => {
+    try {
+      const { session_id } = req.params;
+      
+      const session = await stripe.checkout.sessions.retrieve(session_id);
+      
+      res.json({
+        id: session.id,
+        status: session.status,
+        customer: session.customer,
+        subscription: session.subscription,
+        metadata: session.metadata
+      });
+    } catch (error: any) {
+      console.error('Error retrieving session:', error);
+      res.status(500).json({ message: 'Error retrieving session' });
     }
   });
 
@@ -453,7 +532,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Route for registering user after successful payment
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { 
+        email, 
+        password, 
+        credits = 10, 
+        subscription = "one_time", 
+        stripeCustomerId = null,
+        stripeSubscriptionId = null 
+      } = req.body;
       
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -464,13 +550,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
       
-      // Create user with 10 credits (purchased credits)
+      // Create user with subscription information
       const user = await storage.createUser({
         username: email, // Use email as username for simplicity
         email,
         password: hashedPassword,
-        credits: 10, // Grant purchased credits
-        subscription: "one_time"
+        credits: credits,
+        subscription: subscription,
+        stripeCustomerId: stripeCustomerId,
+        stripeSubscriptionId: stripeSubscriptionId
       });
 
       // Log the user in automatically
