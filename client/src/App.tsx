@@ -9,6 +9,8 @@ import Dashboard from "@/pages/dashboard";
 import Subscribe from "@/pages/subscribe";
 import Checkout from "@/pages/checkout";
 import AuthSelection from "@/pages/auth-selection";
+import Pricing from "@/pages/pricing";
+import SubscriptionSuccess from "@/pages/subscription-success";
 
 function Router() {
   return (
@@ -18,6 +20,8 @@ function Router() {
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/auth-selection" component={AuthSelection} />
+      <Route path="/pricing" component={Pricing} />
+      <Route path="/subscription-success" component={SubscriptionSuccess} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -345,6 +345,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Subscription creation route
+  app.post('/api/create-subscription', async (req, res) => {
+    try {
+      const { planType } = req.body;
+      
+      if (planType === 'test-monthly') {
+        // Create a $1/month subscription
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          line_items: [
+            {
+              price_data: {
+                currency: 'usd',
+                product_data: {
+                  name: 'Test Monthly Plan',
+                  description: '1 video generation credit per month (TEST ONLY)',
+                },
+                unit_amount: 100, // $1.00 in cents
+                recurring: {
+                  interval: 'month',
+                },
+              },
+              quantity: 1,
+            },
+          ],
+          mode: 'subscription',
+          success_url: `${req.protocol}://${req.get('host')}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
+          metadata: {
+            planType: 'test-monthly',
+            credits: '1'
+          }
+        });
+
+        res.json({
+          subscriptionUrl: session.url
+        });
+      } else {
+        res.status(400).json({ message: 'Invalid plan type' });
+      }
+    } catch (error: any) {
+      console.error('Subscription creation error:', error);
+      res.status(500).json({ 
+        message: "Error creating subscription: " + error.message 
+      });
+    }
+  });
+
   // Subscription routes
   app.post('/api/get-or-create-subscription', async (req, res) => {
     if (!req.isAuthenticated()) {
