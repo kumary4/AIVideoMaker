@@ -1,9 +1,7 @@
-// Kling AI API Integration via Replicate
-// This module handles video generation using Kling AI through Replicate's API
-import Replicate from 'replicate';
+// Kling AI API Integration via PiAPI
+// This module handles video generation using Kling AI through PiAPI's API
 
 interface KlingAIConfig {
-  replicateApiToken?: string;
   piApiKey?: string;
 }
 
@@ -25,20 +23,18 @@ interface KlingAIResponse {
 
 class KlingAIService {
   private config: KlingAIConfig;
-  private replicate: Replicate;
   private isSimulation: boolean = false;
+  private piApiBaseUrl = 'https://api.piapi.ai/api/v1';
 
   constructor() {
-    const replicateApiToken = process.env.REPLICATE_API_TOKEN;
-    
-    if (!replicateApiToken) {
-      console.log('REPLICATE_API_TOKEN not found, using simulation mode');
+    this.config = {
+      piApiKey: process.env.KLING_AI_API_KEY,
+    };
+
+    // Enable simulation mode if no API keys are provided
+    if (!this.config.piApiKey) {
       this.isSimulation = true;
-      this.config = { replicateApiToken: '' };
-      this.replicate = new Replicate({ auth: 'dummy' });
-    } else {
-      this.config = { replicateApiToken };
-      this.replicate = new Replicate({ auth: replicateApiToken });
+      console.log('Kling AI: No API keys provided, running in simulation mode');
     }
   }
 
@@ -48,87 +44,49 @@ class KlingAIService {
     }
 
     try {
-      console.log('Starting Kling AI video generation via Replicate...');
+      console.log('Starting Kling AI video generation via PiAPI...');
       console.log('Request parameters:', {
         prompt: request.prompt,
         duration: request.duration,
         aspect_ratio: request.aspectRatio,
-        mode: "standard",
-        cfg_scale: 0.5
+        mode: "standard"
       });
       
-      // Use the Kling AI model on Replicate with timeout
-      const output = await Promise.race([
-        this.replicate.run(
-          "kwaivgi/kling-v2.0", // Official Kling AI model on Replicate
-          {
-            input: {
-              prompt: request.prompt,
-              duration: request.duration,
-              aspect_ratio: request.aspectRatio,
-              cfg_scale: 0.5,
-              negative_prompt: ""
-            }
-          }
-        ),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout after 8 minutes')), 480000)
-        )
-      ]) as any;
+      // PiAPI Kling AI endpoint
+      const response = await fetch(`${this.piApiBaseUrl}/kling/v1/videos/generations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.config.piApiKey!,
+        },
+        body: JSON.stringify({
+          model: 'kling-v1',
+          prompt: request.prompt,
+          duration: request.duration,
+          aspect_ratio: request.aspectRatio,
+          mode: 'standard',
+          cfg_scale: 0.5
+        })
+      });
 
-      console.log('Replicate API response:', output);
-      console.log('Output type:', typeof output);
-      console.log('Output constructor:', output?.constructor?.name);
-      console.log('Output properties:', Object.getOwnPropertyNames(output || {}));
-
-      const taskId = Math.random().toString(36).substr(2, 9);
-      
-      // Handle different output formats from Replicate
-      let videoUrl: string | null = null;
-      
-      if (typeof output === 'string' && output.includes('http')) {
-        videoUrl = output;
-      } else if (Array.isArray(output) && output.length > 0) {
-        const firstOutput = output[0];
-        if (typeof firstOutput === 'string' && firstOutput.includes('http')) {
-          videoUrl = firstOutput;
-        }
-      } else if (output && typeof output.url === 'function') {
-        // Handle Replicate File objects
-        videoUrl = output.url();
-      } else if (output && typeof output === 'object' && output.url) {
-        // Handle object with url property
-        videoUrl = output.url;
-      } else if (output && (output.constructor?.name === 'FileOutput' || output.constructor?.name === 'ReadableStream')) {
-        // Handle Replicate File/Stream objects - these are direct URLs
-        try {
-          // FileOutput objects from Replicate can be used directly as URLs
-          videoUrl = output.toString();
-          console.log('Extracted URL from FileOutput:', videoUrl);
-        } catch (streamError) {
-          console.error('Error handling file output:', streamError);
-          return this.simulateVideoGeneration(request);
-        }
-      }
-      
-      if (videoUrl) {
-        return {
-          taskId,
-          status: 'completed',
-          videoUrl,
-          thumbnailUrl: videoUrl.replace('.mp4', '_thumb.jpg')
-        };
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`PiAPI request failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
+      const data = await response.json();
+      console.log('PiAPI API response:', data);
+
+      // Return the task ID for polling
       return {
-        taskId,
-        status: 'processing'
+        taskId: data.task_id || data.id,
+        status: 'processing',
+        videoUrl: undefined,
+        thumbnailUrl: undefined,
       };
 
     } catch (error: any) {
-      console.error('Replicate Kling AI API error:', error.message);
-      
-      // Fall back to simulation if API fails
+      console.error('PiAPI Kling AI API error:', error.message);
       console.log('Falling back to simulation mode...');
       return this.simulateVideoGeneration(request);
     }
@@ -140,10 +98,53 @@ class KlingAIService {
     }
 
     try {
-      // For Replicate, we'll simulate completion since it typically completes immediately
-      return this.simulateTaskCompletion(taskId);
+      console.log(`Checking task status for ID: ${taskId}`);
+      
+      // PiAPI status check endpoint
+      const response = await fetch(`${this.piApiBaseUrl}/kling/v1/videos/generations/${taskId}`, {
+        method: 'GET',
+        headers: {
+          'X-API-Key': this.config.piApiKey!,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`PiAPI status check failed: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('PiAPI status response:', data);
+
+      // Map PiAPI status to our format
+      let status: 'pending' | 'processing' | 'completed' | 'failed';
+      
+      switch (data.status) {
+        case 'completed':
+        case 'success':
+          status = 'completed';
+          break;
+        case 'failed':
+        case 'error':
+          status = 'failed';
+          break;
+        case 'processing':
+        case 'running':
+          status = 'processing';
+          break;
+        default:
+          status = 'pending';
+      }
+
+      return {
+        taskId,
+        status,
+        videoUrl: data.video_url || data.output_url,
+        thumbnailUrl: data.thumbnail_url || data.preview_url,
+        error: data.error || data.message
+      };
+
     } catch (error: any) {
-      console.error('Replicate status check error:', error.message);
+      console.error('PiAPI status check error:', error.message);
       return {
         taskId,
         status: 'failed',
@@ -153,29 +154,33 @@ class KlingAIService {
   }
 
   private simulateVideoGeneration(request: VideoGenerationRequest): KlingAIResponse {
-    console.log(`Simulating video generation for prompt: "${request.prompt}"`);
+    console.log('Simulating video generation for prompt:', request.prompt);
     
+    const taskId = Math.random().toString(36).substr(2, 9);
+    
+    // Simulate immediate completion with a sample video
     return {
-      taskId: `sim_${Math.random().toString(36).substr(2, 9)}`,
-      status: 'processing'
+      taskId,
+      status: 'completed',
+      videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+      thumbnailUrl: 'https://sample-videos.com/zip/10/jpg/SampleJPGImage_1280x720_1mb.jpg'
     };
   }
 
   private simulateTaskCompletion(taskId: string): KlingAIResponse {
-    // Simulate video completion after a short delay
-    const videoUrl = `https://replicate.delivery/pbxt/sample-video-${taskId}.mp4`;
-    const thumbnailUrl = `https://replicate.delivery/pbxt/sample-thumb-${taskId}.jpg`;
+    console.log('Simulating task completion for ID:', taskId);
     
+    // Simulate completion with sample video
     return {
       taskId,
       status: 'completed',
-      videoUrl,
-      thumbnailUrl
+      videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+      thumbnailUrl: 'https://sample-videos.com/zip/10/jpg/SampleJPGImage_1280x720_1mb.jpg'
     };
   }
 
   isConfigured(): boolean {
-    return !this.isSimulation && !!this.config.replicateApiToken;
+    return !this.isSimulation && !!this.config.piApiKey;
   }
 }
 

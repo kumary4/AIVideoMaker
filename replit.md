@@ -34,9 +34,9 @@ This is a full-stack AI video generation platform similar to InVideo, built with
 - User registration and login endpoints
 
 ### Kling AI Video Generation System
-- **Kling AI Integration**: Professional video generation using Kling AI API
+- **PiAPI Integration**: Professional video generation using Kling AI through PiAPI (90% cheaper than Replicate)
 - **Simulation Mode**: Development-friendly mode with mock generation for testing
-- **Production Mode**: Real Kling AI API integration when credentials are provided
+- **Production Mode**: Real Kling AI API integration via PiAPI when credentials are provided
 - **Async Processing**: Videos generated asynchronously with automatic status polling
 - **Credit System**: Credits deducted based on video duration (1 credit = 30 seconds)
 - **Multiple Styles**: Cinematic, documentary, animation, commercial, educational, creative
@@ -44,6 +44,7 @@ This is a full-stack AI video generation platform similar to InVideo, built with
 - **Duration Control**: 15 seconds to 3 minutes
 - **Status Tracking**: Real-time status updates (generating, completed, failed)
 - **Error Handling**: Automatic fallback to simulation if API fails
+- **Cost Optimization**: $0.13 per 5-second video vs $1.40 on Replicate
 
 ### Subscription Management
 - Stripe integration for payment processing
@@ -130,6 +131,12 @@ Changelog:
   * Discovered Replicate pricing is extremely expensive ($1.40 per 5-second video)
   * Researched cost-effective alternatives (Hailuo AI 93x cheaper)
   * Platform fully functional and ready for alternative API integration
+- July 11, 2025. Migrated from Replicate to PiAPI for cost optimization
+  * Replaced Replicate integration with PiAPI Kling AI service
+  * Reduced video generation cost by 90% ($0.13 vs $1.40 per 5-second video)
+  * Fixed download functionality with proper blob handling
+  * Added real-time timer and automatic status updates
+  * Improved user experience with better feedback and status tracking
 ```
 
 ## User Preferences
