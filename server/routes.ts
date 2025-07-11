@@ -61,7 +61,7 @@ async function generateVideoWithKlingAI(video: any, videoData: any) {
   }
 }
 
-// Poll for video completion status
+// Poll for video completion status (background)
 async function pollVideoCompletion(videoId: number, taskId: string) {
   const maxPollingTime = 300000; // 5 minutes
   const pollingInterval = 10000; // 10 seconds
@@ -95,6 +95,43 @@ async function pollVideoCompletion(videoId: number, taskId: string) {
 
   // Start polling after initial delay
   setTimeout(poll, pollingInterval);
+}
+
+// Synchronous polling for immediate response
+async function pollVideoCompletionSync(videoId: number, taskId: string, res: any) {
+  const maxPollingTime = 120000; // 2 minutes for sync
+  const pollingInterval = 5000; // 5 seconds
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < maxPollingTime) {
+    try {
+      const status = await klingAI.checkTaskStatus(taskId);
+      
+      if (status.status === 'completed') {
+        const updatedVideo = await storage.updateVideoStatus(videoId, "completed", status.videoUrl);
+        console.log(`Video ${videoId} completed successfully`);
+        return res.json(updatedVideo);
+      } else if (status.status === 'failed') {
+        await storage.updateVideoStatus(videoId, "failed");
+        console.log(`Video ${videoId} generation failed`);
+        return res.status(500).json({ message: "Video generation failed" });
+      }
+      
+      // Wait before next check
+      await new Promise(resolve => setTimeout(resolve, pollingInterval));
+    } catch (error) {
+      console.error(`Polling error for video ${videoId}:`, error);
+      await storage.updateVideoStatus(videoId, "failed");
+      return res.status(500).json({ message: "Video generation failed" });
+    }
+  }
+
+  // Timeout - continue with background polling
+  console.log(`Sync polling timeout for video ${videoId}, continuing in background`);
+  pollVideoCompletion(videoId, taskId);
+  
+  const video = await storage.getVideo(videoId);
+  res.json(video);
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -251,15 +288,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Deduct credits
       await storage.updateUserCredits(user.id, user.credits - creditsNeeded);
 
-      // Integrate with Kling AI API
+      // Integrate with Kling AI API and wait for completion
       try {
-        await generateVideoWithKlingAI(video, videoData);
+        const response = await klingAI.generateVideo({
+          prompt: videoData.prompt,
+          duration: videoData.duration,
+          style: videoData.style,
+          aspectRatio: videoData.aspectRatio,
+        });
+
+        if (response.status === 'completed') {
+          // Video completed immediately
+          const updatedVideo = await storage.updateVideoStatus(video.id, "completed", response.videoUrl);
+          res.json(updatedVideo);
+        } else {
+          // Start polling for completion
+          const taskId = response.taskId;
+          await pollVideoCompletionSync(video.id, taskId, res);
+        }
       } catch (error) {
         console.error('Kling AI integration error:', error);
         await storage.updateVideoStatus(video.id, "failed");
+        res.status(500).json({ message: "Video generation failed" });
       }
-
-      res.json(video);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }

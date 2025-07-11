@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -40,18 +40,56 @@ export default function Home() {
     retry: false,
   });
 
+  // Poll for video completion
+  useEffect(() => {
+    if (generatedVideo && !generatedVideo.videoUrl && generatedVideo.status !== 'failed') {
+      const pollInterval = setInterval(async () => {
+        try {
+          const response = await apiRequest("GET", `/api/videos/${generatedVideo.id}`);
+          const updatedVideo = await response.json();
+          
+          if (updatedVideo.videoUrl || updatedVideo.status === 'failed') {
+            setGeneratedVideo(updatedVideo);
+            clearInterval(pollInterval);
+            
+            if (updatedVideo.videoUrl) {
+              toast({
+                title: "Video Ready!",
+                description: "Your video has been generated successfully.",
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error polling video status:', error);
+        }
+      }, 5000); // Poll every 5 seconds
+
+      return () => clearInterval(pollInterval);
+    }
+  }, [generatedVideo, toast]);
+
   const generateVideoMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/generate-video", data);
       return response.json();
     },
     onSuccess: (data: any) => {
+      console.log("Video generation response:", data);
       setGeneratedVideo(data);
       setActiveTab("video");
-      toast({
-        title: "Video Generated Successfully!",
-        description: "Your video is ready. You can watch it below or download it.",
-      });
+      
+      if (data.videoUrl) {
+        toast({
+          title: "Video Generated Successfully!",
+          description: "Your video is ready. You can watch it below or download it.",
+        });
+      } else {
+        toast({
+          title: "Video Generation Started",
+          description: "Your video is being generated. It will appear here when ready.",
+        });
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/me'] });
     },
     onError: (error: any) => {
@@ -230,15 +268,30 @@ export default function Home() {
                 <TabsContent value="video" className="space-y-4">
                   {generatedVideo ? (
                     <div className="bg-white rounded-lg shadow-xl p-6">
-                      <VideoPlayer 
-                        videoUrl={generatedVideo.videoUrl} 
-                        title={generatedVideo.title || "Generated Video"}
-                        onDownload={() => {
-                          if (generatedVideo.videoUrl) {
-                            window.open(generatedVideo.videoUrl, '_blank');
-                          }
-                        }}
-                      />
+                      {generatedVideo.videoUrl ? (
+                        <VideoPlayer 
+                          videoUrl={generatedVideo.videoUrl} 
+                          title={generatedVideo.title || "Generated Video"}
+                          onDownload={() => {
+                            if (generatedVideo.videoUrl) {
+                              window.open(generatedVideo.videoUrl, '_blank');
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="text-center py-16">
+                          <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
+                            <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full"></div>
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Video is being generated...</h3>
+                          <p className="text-gray-600 mb-4">
+                            {generatedVideo.title || "Your video"}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Status: {generatedVideo.status || "processing"}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="text-center py-16">
