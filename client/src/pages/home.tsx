@@ -5,11 +5,13 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import VideoGenerator from "@/components/video-generator";
+import VideoPlayer from "@/components/video-player";
 import PricingCard from "@/components/pricing-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Brain, 
   Images, 
@@ -30,6 +32,8 @@ export default function Home() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [generatedVideo, setGeneratedVideo] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("generate");
 
   const { data: user } = useQuery({
     queryKey: ['/api/me'],
@@ -41,13 +45,14 @@ export default function Home() {
       const response = await apiRequest("POST", "/api/generate-video", data);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      setGeneratedVideo(data);
+      setActiveTab("video");
       toast({
-        title: "Video Generation Started",
-        description: "Your video is being generated. Check your dashboard for updates.",
+        title: "Video Generated Successfully!",
+        description: "Your video is ready. You can watch it below or download it.",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/me'] });
-      navigate('/dashboard');
     },
     onError: (error: any) => {
       if (error.message.includes('Not authenticated')) {
@@ -211,7 +216,46 @@ export default function Home() {
               Turn your ideas into publish-ready content in minutes.
             </p>
             
-            <VideoGenerator onGenerate={generateVideoMutation.mutate} isLoading={generateVideoMutation.isPending} />
+            <div className="max-w-4xl mx-auto">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-8">
+                  <TabsTrigger value="generate">Generate Video</TabsTrigger>
+                  <TabsTrigger value="video">Generated Video</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="generate" className="space-y-4">
+                  <VideoGenerator onGenerate={generateVideoMutation.mutate} isLoading={generateVideoMutation.isPending} />
+                </TabsContent>
+                
+                <TabsContent value="video" className="space-y-4">
+                  {generatedVideo ? (
+                    <div className="bg-white rounded-lg shadow-xl p-6">
+                      <VideoPlayer 
+                        videoUrl={generatedVideo.videoUrl} 
+                        title={generatedVideo.title || "Generated Video"}
+                        onDownload={() => {
+                          if (generatedVideo.videoUrl) {
+                            window.open(generatedVideo.videoUrl, '_blank');
+                          }
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-16">
+                      <Video className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No video generated yet</h3>
+                      <p className="text-gray-600 mb-4">Switch to the Generate Video tab to create your first AI video</p>
+                      <Button 
+                        onClick={() => setActiveTab("generate")} 
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      >
+                        Generate Video
+                      </Button>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
             
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 mt-12">

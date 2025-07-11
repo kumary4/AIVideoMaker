@@ -24,7 +24,7 @@ interface KlingAIResponse {
 class KlingAIService {
   private config: KlingAIConfig;
   private isSimulation: boolean = false;
-  private piApiBaseUrl = 'https://api.piapi.ai/api/v1';
+  private piApiBaseUrl = 'https://api.piapi.ai';
 
   constructor() {
     this.config = {
@@ -52,20 +52,23 @@ class KlingAIService {
         mode: "standard"
       });
       
-      // PiAPI Kling AI endpoint
-      const response = await fetch(`${this.piApiBaseUrl}/kling/v1/videos/generations`, {
+      // PiAPI Kling AI endpoint - using the correct task-based API
+      const response = await fetch(`${this.piApiBaseUrl}/api/v1/task`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-API-Key': this.config.piApiKey!,
         },
         body: JSON.stringify({
-          model: 'kling-v1',
-          prompt: request.prompt,
-          duration: request.duration,
-          aspect_ratio: request.aspectRatio,
-          mode: 'standard',
-          cfg_scale: 0.5
+          model: 'kling',
+          task_type: 'video_generation',
+          input: {
+            prompt: request.prompt,
+            duration: request.duration,
+            aspect_ratio: request.aspectRatio,
+            mode: 'std',
+            cfg_scale: 0.5
+          }
         })
       });
 
@@ -79,7 +82,7 @@ class KlingAIService {
 
       // Return the task ID for polling
       return {
-        taskId: data.task_id || data.id,
+        taskId: data.data?.task_id || data.task_id || data.id,
         status: 'processing',
         videoUrl: undefined,
         thumbnailUrl: undefined,
@@ -101,7 +104,7 @@ class KlingAIService {
       console.log(`Checking task status for ID: ${taskId}`);
       
       // PiAPI status check endpoint
-      const response = await fetch(`${this.piApiBaseUrl}/kling/v1/videos/generations/${taskId}`, {
+      const response = await fetch(`${this.piApiBaseUrl}/api/v1/task/${taskId}`, {
         method: 'GET',
         headers: {
           'X-API-Key': this.config.piApiKey!,
@@ -117,8 +120,9 @@ class KlingAIService {
 
       // Map PiAPI status to our format
       let status: 'pending' | 'processing' | 'completed' | 'failed';
+      const taskData = data.data || data;
       
-      switch (data.status) {
+      switch (taskData.status) {
         case 'completed':
         case 'success':
           status = 'completed';
@@ -135,12 +139,19 @@ class KlingAIService {
           status = 'pending';
       }
 
+      // Extract video URL from PiAPI response structure
+      let videoUrl = null;
+      if (taskData.output && taskData.output.works && taskData.output.works.length > 0) {
+        const work = taskData.output.works[0];
+        videoUrl = work.video?.resource || work.video?.resource_without_watermark;
+      }
+
       return {
         taskId,
         status,
-        videoUrl: data.video_url || data.output_url,
-        thumbnailUrl: data.thumbnail_url || data.preview_url,
-        error: data.error || data.message
+        videoUrl: videoUrl || taskData.video_url || taskData.output_url,
+        thumbnailUrl: taskData.thumbnail_url || taskData.preview_url,
+        error: taskData.error || taskData.message
       };
 
     } catch (error: any) {
