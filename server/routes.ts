@@ -346,6 +346,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create subscription intent for direct payment
+  app.post('/api/create-subscription-intent', async (req, res) => {
+    try {
+      const { planType } = req.body;
+      
+      if (planType === 'test-monthly') {
+        // Create a customer first
+        const customer = await stripe.customers.create({
+          metadata: {
+            planType: 'test-monthly'
+          }
+        });
+
+        // Create a subscription with trial period for setup
+        const subscription = await stripe.subscriptions.create({
+          customer: customer.id,
+          items: [
+            {
+              price: 'price_1RjoXvL1XVwzAcxzkLbgdb6X',
+            },
+          ],
+          payment_behavior: 'default_incomplete',
+          expand: ['latest_invoice.payment_intent'],
+        });
+
+        const clientSecret = subscription.latest_invoice?.payment_intent?.client_secret;
+        
+        if (!clientSecret) {
+          throw new Error('Failed to create payment intent');
+        }
+
+        console.log('Created subscription intent:', subscription.id);
+        res.json({
+          clientSecret,
+          subscriptionId: subscription.id,
+          customerId: customer.id
+        });
+      } else {
+        res.status(400).json({ message: 'Invalid plan type' });
+      }
+    } catch (error: any) {
+      console.error('Subscription intent creation error:', error);
+      res.status(500).json({ 
+        message: "Error creating subscription intent: " + error.message 
+      });
+    }
+  });
+
   // Subscription creation route
   app.post('/api/create-subscription', async (req, res) => {
     try {

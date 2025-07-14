@@ -20,6 +20,9 @@ export default function Pricing() {
         // Redirect to existing checkout for one-time purchase
         navigate("/checkout");
         return;
+      } else if (planType === 'test-monthly') {
+        // Redirect to direct subscription page
+        navigate("/subscription-direct");
       } else {
         // Create subscription
         console.log('Creating subscription for plan:', planType);
