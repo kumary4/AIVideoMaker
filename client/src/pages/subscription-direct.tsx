@@ -29,20 +29,22 @@ const SubscriptionForm = () => {
     setIsProcessing(true);
 
     try {
-      const { error } = await stripe.confirmPayment({
+      const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: `${window.location.protocol}//${window.location.host}/subscription-success`,
         },
+        redirect: 'if_required'
       });
 
       if (error) {
+        console.error('Payment error:', error);
         toast({
           title: "Payment Failed",
           description: error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         toast({
           title: "Payment Successful",
           description: "Your subscription is now active!",
@@ -50,9 +52,10 @@ const SubscriptionForm = () => {
         navigate('/subscription-success');
       }
     } catch (err: any) {
+      console.error('Stripe error:', err);
       toast({
         title: "Error",
-        description: err.message,
+        description: err.message || "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
