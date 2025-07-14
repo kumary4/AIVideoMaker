@@ -145,6 +145,12 @@ Changelog:
   * Added post-payment authentication with email/password and Google (coming soon)
   * Created seamless payment-to-account creation flow
   * Updated user schema to start with 0 credits instead of 5 free credits
+- July 14, 2025. Fixed Stripe integration and added $1 test subscription
+  * Resolved Stripe key configuration issue (was using secret key instead of publishable key)
+  * Created direct subscription form using Stripe Elements instead of problematic checkout redirect
+  * Added $1/month test subscription with proper Stripe product integration
+  * Implemented subscription intent creation with customer and subscription management
+  * Fixed blank Stripe checkout pages by using embedded payment elements
 ```
 
 ## User Preferences

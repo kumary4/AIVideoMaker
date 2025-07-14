@@ -32,7 +32,7 @@ const SubscriptionForm = () => {
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/subscription-success`,
+          return_url: `${window.location.protocol}//${window.location.host}/subscription-success`,
         },
       });
 
