@@ -13,6 +13,7 @@ import Pricing from "@/pages/pricing";
 import SubscriptionSuccess from "@/pages/subscription-success";
 import TestStripe from "@/pages/test-stripe";
 import SubscriptionDirect from "@/pages/subscription-direct";
+import DebugKeys from "@/pages/debug-keys";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/subscription-success" component={SubscriptionSuccess} />
       <Route path="/test-stripe" component={TestStripe} />
       <Route path="/subscription-direct" component={SubscriptionDirect} />
+      <Route path="/debug-keys" component={DebugKeys} />
       <Route component={NotFound} />
     </Switch>
   );
