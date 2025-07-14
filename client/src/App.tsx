@@ -11,6 +11,7 @@ import Checkout from "@/pages/checkout";
 import AuthSelection from "@/pages/auth-selection";
 import Pricing from "@/pages/pricing";
 import SubscriptionSuccess from "@/pages/subscription-success";
+import TestStripe from "@/pages/test-stripe";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/auth-selection" component={AuthSelection} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
+      <Route path="/test-stripe" component={TestStripe} />
       <Route component={NotFound} />
     </Switch>
   );

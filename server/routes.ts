@@ -352,28 +352,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { planType } = req.body;
       
       if (planType === 'test-monthly') {
-        // First, get the product to find its price
-        const product = await stripe.products.retrieve('prod_Sf8piUnhOUMOw5');
+        // Use the specific price ID directly
+        const priceId = 'price_1RjoXvL1XVwzAcxzkLbgdb6X';
         
-        // Get the prices for this product
-        const prices = await stripe.prices.list({
-          product: 'prod_Sf8piUnhOUMOw5',
-          active: true
-        });
-        
-        if (prices.data.length === 0) {
-          throw new Error('No active prices found for product');
-        }
-        
-        // Use the first active price
-        const price = prices.data[0];
-        
-        // Create subscription checkout session
+        // Create subscription checkout session with minimal configuration
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ['card'],
           line_items: [
             {
-              price: price.id,
+              price: priceId,
               quantity: 1,
             },
           ],
@@ -383,10 +370,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: {
             planType: 'test-monthly',
             credits: '1'
+          },
+          // Add customer creation
+          customer_creation: 'always',
+          // Collect tax IDs if needed
+          tax_id_collection: {
+            enabled: false
           }
         });
 
         console.log('Created Stripe session:', session.id);
+        console.log('Session URL:', session.url);
         res.json({
           subscriptionUrl: session.url
         });
