@@ -370,12 +370,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: {
             planType: 'test-monthly',
             credits: '1'
-          },
-          // Add customer creation
-          customer_creation: 'always',
-          // Collect tax IDs if needed
-          tax_id_collection: {
-            enabled: false
           }
         });
 
