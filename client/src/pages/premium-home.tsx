@@ -183,25 +183,25 @@ export default function PremiumHome() {
           <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-blue-900/20"></div>
           <div className="relative max-w-7xl mx-auto px-6 py-32">
             <div className="text-center">
-              <div className="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-8">
+              <div className="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-8 animate-fade-in">
                 <Sparkles className="h-4 w-4 text-purple-400" />
                 <span className="text-sm font-medium">Powered by Kling AI</span>
               </div>
               
-              <h1 className="text-6xl md:text-8xl font-bold mb-6">
+              <h1 className="text-6xl md:text-8xl font-bold mb-6 animate-fade-in-up">
                 <span className="text-gradient">Create</span> Pro-Level<br />
-                Videos with <span className="text-gradient">AI</span>
+                Videos with <span className="text-gradient animate-shimmer">AI</span>
               </h1>
               
-              <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+              <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in-up">
                 Transform your ideas into stunning professional videos in minutes. 
                 No editing skills required - just describe what you want and let AI do the magic.
               </p>
               
-              <div className="flex items-center justify-center space-x-6">
+              <div className="flex items-center justify-center space-x-6 animate-fade-in-up">
                 <Button 
                   onClick={() => navigate('/pricing')} 
-                  className="btn-premium text-lg px-8 py-4 h-14"
+                  className="btn-premium text-lg px-8 py-4 h-14 animate-glow"
                 >
                   <Rocket className="h-5 w-5 mr-2" />
                   Start Creating
@@ -218,17 +218,150 @@ export default function PremiumHome() {
           </div>
         </section>
 
+        {/* Video Showcase Section */}
+        <section className="py-32 border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-6 animate-fade-in-up">
+                See What's Possible with <span className="text-gradient">AI Video Generation</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-in-up">
+                Real videos created by our AI in under 2 minutes
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Demo Video 1 */}
+              <div className="card-premium group animate-fade-in-up">
+                <div className="relative overflow-hidden rounded-t-2xl">
+                  <div className="aspect-video bg-gradient-to-br from-purple-900/30 to-blue-900/30 flex items-center justify-center relative">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.2)_0%,transparent_70%)] animate-pulse-slow"></div>
+                    <div className="relative z-10">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
+                        <Play className="h-6 w-6 text-white ml-1" />
+                      </div>
+                      <p className="text-sm text-purple-300 font-medium">Cinematic Style</p>
+                      <p className="text-xs text-muted-foreground mt-1">"A futuristic city at sunset"</p>
+                    </div>
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                      AI Generated
+                    </Badge>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="font-semibold mb-2">Futuristic Cityscape</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Generated in 1.2 minutes • 30 seconds • 1080p HD
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 bg-white/10 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full w-full"></div>
+                    </div>
+                    <span className="text-xs text-green-400">100%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Demo Video 2 */}
+              <div className="card-premium group animate-fade-in-up delay-200">
+                <div className="relative overflow-hidden rounded-t-2xl">
+                  <div className="aspect-video bg-gradient-to-br from-pink-900/30 to-orange-900/30 flex items-center justify-center relative">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(236,72,153,0.2)_0%,transparent_70%)] animate-pulse-slow"></div>
+                    <div className="relative z-10">
+                      <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
+                        <Play className="h-6 w-6 text-white ml-1" />
+                      </div>
+                      <p className="text-sm text-pink-300 font-medium">Documentary Style</p>
+                      <p className="text-xs text-muted-foreground mt-1">"Ocean waves at golden hour"</p>
+                    </div>
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                      Generating...
+                    </Badge>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="font-semibold mb-2">Ocean Serenity</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Generating... • 45 seconds • 4K Ultra HD
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 bg-white/10 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-pink-500 to-orange-500 h-2 rounded-full w-3/4 animate-pulse"></div>
+                    </div>
+                    <span className="text-xs text-blue-400">75%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Demo Video 3 */}
+              <div className="card-premium group animate-fade-in-up delay-400">
+                <div className="relative overflow-hidden rounded-t-2xl">
+                  <div className="aspect-video bg-gradient-to-br from-green-900/30 to-teal-900/30 flex items-center justify-center relative">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.2)_0%,transparent_70%)] animate-pulse-slow"></div>
+                    <div className="relative z-10">
+                      <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
+                        <Play className="h-6 w-6 text-white ml-1" />
+                      </div>
+                      <p className="text-sm text-green-300 font-medium">Animation Style</p>
+                      <p className="text-xs text-muted-foreground mt-1">"Floating islands in space"</p>
+                    </div>
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                      Queued
+                    </Badge>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="font-semibold mb-2">Floating Paradise</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Queued for generation • 60 seconds • 4K Ultra HD
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 bg-white/10 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-green-500 to-teal-500 h-2 rounded-full w-1/4"></div>
+                    </div>
+                    <span className="text-xs text-purple-400">25%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-16">
+              <Button 
+                onClick={() => navigate('/pricing')} 
+                className="btn-premium text-lg px-8 py-4 h-14"
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                Create Your Own Video
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* Stats Section */}
         <section className="py-20 border-t border-white/10">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="text-purple-400 mr-2">{stat.icon}</div>
+                <div key={index} className="text-center card-premium p-6 animate-fade-in-up" style={{animationDelay: `${index * 100}ms`}}>
+                  <div className="flex items-center justify-center mb-4">
+                    <div className={`gradient-primary w-12 h-12 rounded-xl flex items-center justify-center animate-float`} style={{animationDelay: `${index * 500}ms`}}>
+                      <div className="text-white">{stat.icon}</div>
+                    </div>
                   </div>
-                  <div className="text-3xl font-bold text-gradient mb-1">{stat.number}</div>
+                  <div className="text-3xl font-bold text-gradient mb-2 animate-shimmer">{stat.number}</div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="mt-3 w-full bg-white/10 rounded-full h-1">
+                    <div 
+                      className="bg-gradient-to-r from-purple-500 to-blue-500 h-1 rounded-full animate-pulse"
+                      style={{width: `${Math.min(100, (index + 1) * 25)}%`}}
+                    ></div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -236,27 +369,185 @@ export default function PremiumHome() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-32">
-          <div className="max-w-7xl mx-auto px-6">
+        <section id="features" className="py-32 relative overflow-hidden">
+          {/* Floating background elements */}
+          <div className="absolute top-10 left-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl animate-float-delayed"></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl animate-pulse-slow"></div>
+          
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="text-center mb-20">
-              <h2 className="text-4xl font-bold mb-6">
+              <h2 className="text-4xl font-bold mb-6 animate-fade-in-up">
                 Everything You Need to Create <span className="text-gradient">Amazing Videos</span>
               </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-in-up">
                 Powerful AI tools that make professional video creation accessible to everyone
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
-                <div key={index} className="card-premium p-8 text-center">
-                  <div className="gradient-primary w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div key={index} className="card-premium p-8 text-center group animate-fade-in-up" style={{animationDelay: `${index * 150}ms`}}>
+                  <div className="gradient-primary w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
                     <div className="text-white">{feature.icon}</div>
                   </div>
                   <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
+                  <div className="mt-4 w-full bg-white/10 rounded-full h-1">
+                    <div 
+                      className="bg-gradient-to-r from-purple-500 to-blue-500 h-1 rounded-full transition-all duration-1000"
+                      style={{width: `${Math.min(100, (index + 1) * 20 + 20)}%`}}
+                    ></div>
+                  </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Live Generation Activity */}
+        <section className="py-32 border-t border-white/10 relative">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-8">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium">Live Generation Activity</span>
+              </div>
+              <h2 className="text-4xl font-bold mb-6">
+                <span className="text-gradient">Real-Time</span> Video Creation
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Watch as our AI creates stunning videos in real-time across the globe
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              {/* Live Stats */}
+              <div className="space-y-6">
+                <div className="card-premium p-6 animate-fade-in-up">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Global Activity</h3>
+                    <Badge className="bg-green-500/20 text-green-400">
+                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                      Live
+                    </Badge>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Videos Generated Today</span>
+                      <span className="text-2xl font-bold text-gradient animate-shimmer">12,847</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Average Generation Time</span>
+                      <span className="text-lg font-semibold">1.2 min</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Success Rate</span>
+                      <span className="text-lg font-semibold text-green-400">99.8%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Active Users</span>
+                      <span className="text-lg font-semibold text-purple-400">2,347</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="card-premium p-6 animate-fade-in-up">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">AI Performance</h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                      <span className="text-sm text-purple-400">Optimizing</span>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">GPU Utilization</span>
+                        <span className="text-sm">87%</span>
+                      </div>
+                      <div className="w-full bg-white/10 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full w-[87%] animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">Model Accuracy</span>
+                        <span className="text-sm">94%</span>
+                      </div>
+                      <div className="w-full bg-white/10 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-green-500 to-teal-500 h-2 rounded-full w-[94%]"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">Queue Processing</span>
+                        <span className="text-sm">76%</span>
+                      </div>
+                      <div className="w-full bg-white/10 rounded-full h-2">
+                        <div className="bg-gradient-to-r from-pink-500 to-orange-500 h-2 rounded-full w-[76%] animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Preview */}
+              <div className="card-premium p-8 text-center animate-fade-in-up">
+                <div className="aspect-video bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-2xl flex items-center justify-center relative mb-6 overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.3)_0%,transparent_70%)] animate-pulse-slow"></div>
+                  <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent,rgba(168,85,247,0.1),transparent)] animate-spin-slow"></div>
+                  <div className="relative z-10">
+                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
+                      <Sparkles className="h-8 w-8 text-white" />
+                    </div>
+                    <p className="text-lg font-semibold mb-2">Currently Generating</p>
+                    <p className="text-sm text-muted-foreground mb-4">"A dragon soaring through misty mountains"</p>
+                    <div className="flex items-center justify-center space-x-1">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm text-muted-foreground">Progress</span>
+                  <span className="text-sm font-semibold">67%</span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-3 mb-4">
+                  <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full w-[67%] animate-pulse"></div>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Estimated completion: 45 seconds
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Generations */}
+            <div className="mt-16">
+              <h3 className="text-2xl font-bold mb-8 text-center">
+                Recent <span className="text-gradient">Generations</span>
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { title: "Sunset Beach", user: "Sarah M.", time: "2 min ago", status: "completed" },
+                  { title: "City Nightscape", user: "Alex K.", time: "3 min ago", status: "completed" },
+                  { title: "Forest Adventure", user: "Mike R.", time: "5 min ago", status: "completed" }
+                ].map((item, index) => (
+                  <div key={index} className="card-premium p-4 animate-fade-in-up" style={{animationDelay: `${index * 100}ms`}}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-sm">{item.title}</h4>
+                      <Badge className="bg-green-500/20 text-green-400 text-xs">
+                        {item.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>by {item.user}</span>
+                      <span>{item.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
