@@ -17,6 +17,8 @@ import SubscriptionSuccess from "@/pages/subscription-success";
 import TestStripe from "@/pages/test-stripe";
 import SubscriptionDirect from "@/pages/subscription-direct";
 import DebugKeys from "@/pages/debug-keys";
+import Teams from "@/pages/teams";
+import TeamDashboard from "@/pages/team-dashboard";
 
 function Router() {
   return (
@@ -31,6 +33,8 @@ function Router() {
       <Route path="/test-stripe" component={TestStripe} />
       <Route path="/subscription-direct" component={SubscriptionDirect} />
       <Route path="/debug-keys" component={DebugKeys} />
+      <Route path="/teams" component={Teams} />
+      <Route path="/teams/:teamId/dashboard" component={TeamDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

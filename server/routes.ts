@@ -2,13 +2,22 @@ import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, loginSchema, videoGenerationSchema } from "@shared/schema";
+import { 
+  insertUserSchema, 
+  loginSchema, 
+  videoGenerationSchema,
+  teamCreationSchema,
+  teamInviteSchema,
+  commentSchema,
+  projectSchema
+} from "@shared/schema";
 import { klingAI } from "./kling-ai";
 import Stripe from "stripe";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import { nanoid } from "nanoid";
 
 declare global {
   namespace Express {
@@ -635,6 +644,279 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ received: true });
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Team collaboration routes
+  
+  // Get user's teams
+  app.get("/api/teams", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const teams = await storage.getTeamsByUserId(req.user!.id);
+      res.json(teams);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Create new team
+  app.post("/api/teams", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const validatedData = teamCreationSchema.parse(req.body);
+      const team = await storage.createTeam({
+        ...validatedData,
+        ownerId: req.user!.id
+      });
+      res.json(team);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Get team details
+  app.get("/api/teams/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const teamId = parseInt(req.params.id);
+      const team = await storage.getTeam(teamId);
+      
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+
+      // Check if user is a member of this team
+      const member = await storage.getTeamMember(teamId, req.user!.id);
+      if (!member) {
+        return res.status(403).json({ message: "Not a member of this team" });
+      }
+
+      res.json(team);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get team members
+  app.get("/api/teams/:id/members", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const teamId = parseInt(req.params.id);
+      
+      // Check if user is a member of this team
+      const member = await storage.getTeamMember(teamId, req.user!.id);
+      if (!member) {
+        return res.status(403).json({ message: "Not a member of this team" });
+      }
+
+      const members = await storage.getTeamMembers(teamId);
+      
+      // Include user details for each member
+      const membersWithUsers = await Promise.all(
+        members.map(async (member) => {
+          const user = await storage.getUser(member.userId);
+          return { ...member, user };
+        })
+      );
+
+      res.json(membersWithUsers);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Invite member to team
+  app.post("/api/teams/:id/invite", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const teamId = parseInt(req.params.id);
+      const validatedData = teamInviteSchema.parse(req.body);
+      
+      // Check if user can manage team
+      const member = await storage.getTeamMember(teamId, req.user!.id);
+      if (!member || (!member.permissions?.canManageMembers && member.role !== 'owner')) {
+        return res.status(403).json({ message: "Not authorized to invite members" });
+      }
+
+      const invite = await storage.createTeamInvite({
+        teamId,
+        email: validatedData.email,
+        role: validatedData.role,
+        invitedById: req.user!.id,
+        token: nanoid(32),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+      });
+
+      res.json(invite);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Get team projects
+  app.get("/api/teams/:id/projects", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const teamId = parseInt(req.params.id);
+      
+      // Check if user is a member of this team
+      const member = await storage.getTeamMember(teamId, req.user!.id);
+      if (!member) {
+        return res.status(403).json({ message: "Not a member of this team" });
+      }
+
+      const projects = await storage.getProjectsByTeamId(teamId);
+      res.json(projects);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Create new project
+  app.post("/api/projects", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const validatedData = projectSchema.parse(req.body);
+      const { teamId } = req.body;
+      
+      // Check if user can create projects in this team
+      const member = await storage.getTeamMember(teamId, req.user!.id);
+      if (!member || !member.permissions?.canCreateVideos) {
+        return res.status(403).json({ message: "Not authorized to create projects" });
+      }
+
+      const project = await storage.createProject({
+        ...validatedData,
+        teamId,
+        createdById: req.user!.id
+      });
+
+      res.json(project);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Get team videos
+  app.get("/api/teams/:id/videos", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const teamId = parseInt(req.params.id);
+      
+      // Check if user is a member of this team
+      const member = await storage.getTeamMember(teamId, req.user!.id);
+      if (!member) {
+        return res.status(403).json({ message: "Not a member of this team" });
+      }
+
+      const videos = await storage.getVideosByTeamId(teamId);
+      res.json(videos);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Add comment to video
+  app.post("/api/videos/:id/comments", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const videoId = parseInt(req.params.id);
+      const validatedData = commentSchema.parse(req.body);
+      
+      // Check if user can access this video
+      const video = await storage.getVideo(videoId);
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+
+      // Check team membership if it's a team video
+      if (video.teamId) {
+        const member = await storage.getTeamMember(video.teamId, req.user!.id);
+        if (!member) {
+          return res.status(403).json({ message: "Not authorized to comment on this video" });
+        }
+      } else if (video.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to comment on this video" });
+      }
+
+      const comment = await storage.createComment({
+        ...validatedData,
+        videoId,
+        userId: req.user!.id
+      });
+
+      res.json(comment);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Get video comments
+  app.get("/api/videos/:id/comments", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const videoId = parseInt(req.params.id);
+      
+      // Check if user can access this video
+      const video = await storage.getVideo(videoId);
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+
+      // Check team membership if it's a team video
+      if (video.teamId) {
+        const member = await storage.getTeamMember(video.teamId, req.user!.id);
+        if (!member) {
+          return res.status(403).json({ message: "Not authorized to view comments" });
+        }
+      } else if (video.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to view comments" });
+      }
+
+      const comments = await storage.getCommentsByVideoId(videoId);
+      
+      // Include user details for each comment
+      const commentsWithUsers = await Promise.all(
+        comments.map(async (comment) => {
+          const user = await storage.getUser(comment.userId);
+          return { ...comment, user };
+        })
+      );
+
+      res.json(commentsWithUsers);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 

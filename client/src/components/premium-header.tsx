@@ -16,7 +16,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, User, LogOut, Settings, CreditCard, Sparkles, Zap, Crown } from "lucide-react";
+import { Play, User, LogOut, Settings, CreditCard, Sparkles, Zap, Crown, Users } from "lucide-react";
 
 export default function PremiumHeader() {
   const [, navigate] = useLocation();
@@ -185,6 +185,10 @@ export default function PremiumHeader() {
                     <DropdownMenuItem onClick={() => navigate('/dashboard')} className="hover:bg-white/10">
                       <Settings className="mr-3 h-4 w-4" />
                       <span>Dashboard</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/teams')} className="hover:bg-white/10">
+                      <Users className="mr-3 h-4 w-4" />
+                      <span>Teams</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/pricing')} className="hover:bg-white/10">
                       <CreditCard className="mr-3 h-4 w-4" />
