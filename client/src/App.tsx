@@ -5,11 +5,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
+import PremiumHome from "@/pages/premium-home";
 import Dashboard from "@/pages/dashboard";
+import PremiumDashboard from "@/pages/premium-dashboard";
 import Subscribe from "@/pages/subscribe";
 import Checkout from "@/pages/checkout";
 import AuthSelection from "@/pages/auth-selection";
 import Pricing from "@/pages/pricing";
+import PremiumPricing from "@/pages/premium-pricing";
 import SubscriptionSuccess from "@/pages/subscription-success";
 import TestStripe from "@/pages/test-stripe";
 import SubscriptionDirect from "@/pages/subscription-direct";
@@ -18,12 +21,12 @@ import DebugKeys from "@/pages/debug-keys";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/" component={PremiumHome} />
+      <Route path="/dashboard" component={PremiumDashboard} />
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/auth-selection" component={AuthSelection} />
-      <Route path="/pricing" component={Pricing} />
+      <Route path="/pricing" component={PremiumPricing} />
       <Route path="/subscription-success" component={SubscriptionSuccess} />
       <Route path="/test-stripe" component={TestStripe} />
       <Route path="/subscription-direct" component={SubscriptionDirect} />
