@@ -90,18 +90,18 @@ export default function Teams() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 md:mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Teams</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Teams</h1>
             <p className="text-muted-foreground">
               Collaborate with your team on video projects
             </p>
           </div>
           <Button 
             onClick={() => createTeamMutation.mutate()}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 w-full sm:w-auto"
             disabled={createTeamMutation.isPending}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -122,7 +122,7 @@ export default function Teams() {
 
         {/* Teams Grid */}
         {filteredTeams && filteredTeams.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {filteredTeams.map((team) => (
               <Card key={team.id} className="card-premium border-white/10 hover:border-purple-500/50 transition-all duration-300">
                 <CardHeader className="pb-3">

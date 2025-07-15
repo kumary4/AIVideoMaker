@@ -181,36 +181,36 @@ export default function PremiumHome() {
         {/* Hero Section */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-blue-900/20"></div>
-          <div className="relative max-w-7xl mx-auto px-6 py-32">
+          <div className="relative max-w-7xl mx-auto px-4 md:px-6 py-20 md:py-32">
             <div className="text-center">
-              <div className="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-8 animate-fade-in">
+              <div className="inline-flex items-center space-x-2 glass px-3 md:px-4 py-2 rounded-full mb-6 md:mb-8 animate-fade-in">
                 <Sparkles className="h-4 w-4 text-purple-400" />
                 <span className="text-sm font-medium">Powered by Kling AI</span>
               </div>
               
-              <h1 className="text-6xl md:text-8xl font-bold mb-6 animate-fade-in-up">
+              <h1 className="text-4xl md:text-6xl lg:text-8xl font-bold mb-4 md:mb-6 animate-fade-in-up">
                 <span className="text-gradient">Create</span> Pro-Level<br />
                 Videos with <span className="text-gradient animate-shimmer">AI</span>
               </h1>
               
-              <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in-up">
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 md:mb-12 max-w-2xl mx-auto animate-fade-in-up px-4">
                 Transform your ideas into stunning professional videos in minutes. 
                 No editing skills required - just describe what you want and let AI do the magic.
               </p>
               
-              <div className="flex items-center justify-center space-x-6 animate-fade-in-up">
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 animate-fade-in-up px-4">
                 <Button 
                   onClick={() => navigate('/pricing')} 
-                  className="btn-premium text-lg px-8 py-4 h-14 animate-glow"
+                  className="btn-premium text-base md:text-lg px-6 md:px-8 py-3 md:py-4 h-12 md:h-14 animate-glow w-full sm:w-auto"
                 >
-                  <Rocket className="h-5 w-5 mr-2" />
+                  <Rocket className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Start Creating
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="text-lg px-8 py-4 h-14 hover:bg-white/10"
+                  className="text-base md:text-lg px-6 md:px-8 py-3 md:py-4 h-12 md:h-14 hover:bg-white/10 w-full sm:w-auto"
                 >
-                  <Play className="h-5 w-5 mr-2" />
+                  <Play className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Watch Demo
                 </Button>
               </div>
@@ -219,10 +219,10 @@ export default function PremiumHome() {
         </section>
 
         {/* Video Showcase Section */}
-        <section className="py-32 border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-6 animate-fade-in-up">
+        <section className="py-16 md:py-32 border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
+            <div className="text-center mb-8 md:mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 animate-fade-in-up">
                 See What's Possible with <span className="text-gradient">AI Video Generation</span>
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-in-up">

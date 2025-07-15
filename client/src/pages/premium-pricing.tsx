@@ -147,18 +147,18 @@ export default function PremiumPricing() {
       <PremiumHeader />
       
       {/* Hero Section */}
-      <section className="py-20 text-center">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-8">
+      <section className="py-12 md:py-20 text-center">
+        <div className="max-w-4xl mx-auto px-4 md:px-6">
+          <div className="inline-flex items-center space-x-2 glass px-3 md:px-4 py-2 rounded-full mb-6 md:mb-8">
             <Crown className="h-4 w-4 text-purple-400" />
             <span className="text-sm font-medium">Premium AI Video Generation</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
             Choose Your <span className="text-gradient">Creative Plan</span>
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 md:mb-12 max-w-2xl mx-auto">
             Scale your video creation with our flexible pricing plans. 
             From individual creators to enterprise teams.
           </p>
@@ -166,9 +166,9 @@ export default function PremiumPricing() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-16 border-y border-white/10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <section className="py-12 md:py-16 border-y border-white/10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {features.map((feature, index) => (
               <div key={index} className="flex items-center space-x-3">
                 <div className="gradient-primary w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -185,9 +185,9 @@ export default function PremiumPricing() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8">
+      <section className="py-12 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {plans.map((plan) => (
               <div key={plan.id} className="relative">
                 {plan.popular && (

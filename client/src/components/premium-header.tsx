@@ -104,26 +104,26 @@ export default function PremiumHeader() {
 
   return (
     <header className="glass border-b border-white/10 backdrop-blur-xl sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 md:h-20">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
             <div className="relative">
-              <div className="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
-                <Play className="text-white h-6 w-6 ml-0.5" />
+              <div className="w-10 h-10 md:w-12 md:h-12 gradient-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-glow">
+                <Play className="text-white h-5 w-5 md:h-6 md:w-6 ml-0.5" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-400 rounded-full flex items-center justify-center">
+              <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-cyan-400 rounded-full flex items-center justify-center">
                 <Sparkles className="h-2 w-2 text-black" />
               </div>
             </div>
-            <div className="ml-4 flex flex-col">
-              <span className="text-2xl font-bold text-gradient">VideoGen</span>
-              <span className="text-xs text-muted-foreground">AI Video Studio</span>
+            <div className="ml-2 md:ml-4 flex flex-col">
+              <span className="text-lg md:text-2xl font-bold text-gradient">VideoGen</span>
+              <span className="text-xs text-muted-foreground hidden md:block">AI Video Studio</span>
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-8">
             <a href="#features" className="text-muted-foreground hover:text-white transition-colors duration-200">Features</a>
             <a href="#pricing" className="text-muted-foreground hover:text-white transition-colors duration-200">Pricing</a>
             <a href="#gallery" className="text-muted-foreground hover:text-white transition-colors duration-200">Gallery</a>
@@ -131,14 +131,14 @@ export default function PremiumHeader() {
           </nav>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 md:space-x-4">
                 {/* Credits Badge */}
-                <div className="glass px-4 py-2 rounded-full">
-                  <div className="flex items-center space-x-2">
+                <div className="glass px-2 md:px-4 py-1 md:py-2 rounded-full">
+                  <div className="flex items-center space-x-1 md:space-x-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium">{user.credits} Credits</span>
+                    <span className="text-xs md:text-sm font-medium">{user.credits} Credits</span>
                   </div>
                 </div>
 
@@ -148,15 +148,15 @@ export default function PremiumHeader() {
                   className="btn-premium"
                   size="sm"
                 >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Studio
+                  <Zap className="h-4 w-4 mr-1 md:mr-2" />
+                  <span className="hidden md:inline">Studio</span>
                 </Button>
 
                 {/* User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-12 w-12 rounded-2xl glass hover:bg-white/10">
-                      <User className="h-5 w-5" />
+                    <Button variant="ghost" className="relative h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl glass hover:bg-white/10">
+                      <User className="h-4 w-4 md:h-5 md:w-5" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64 glass border-white/10" align="end" forceMount>
@@ -203,11 +203,11 @@ export default function PremiumHeader() {
                 </DropdownMenu>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 md:space-x-4">
                 {/* Login Dialog */}
                 <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="ghost" className="hover:bg-white/10">
+                    <Button variant="ghost" className="hover:bg-white/10 text-sm md:text-base px-2 md:px-4">
                       Sign In
                     </Button>
                   </DialogTrigger>
@@ -250,9 +250,10 @@ export default function PremiumHeader() {
                 {/* Register Dialog */}
                 <Dialog open={isRegisterOpen} onOpenChange={setIsRegisterOpen}>
                   <DialogTrigger asChild>
-                    <Button className="btn-premium">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Get Started
+                    <Button className="btn-premium text-sm md:text-base px-3 md:px-4">
+                      <Sparkles className="h-4 w-4 mr-1 md:mr-2" />
+                      <span className="hidden sm:inline">Get Started</span>
+                      <span className="sm:hidden">Start</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="glass border-white/10">
