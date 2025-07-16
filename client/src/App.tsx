@@ -19,11 +19,13 @@ import SubscriptionDirect from "@/pages/subscription-direct";
 import DebugKeys from "@/pages/debug-keys";
 import Teams from "@/pages/teams";
 import TeamDashboard from "@/pages/team-dashboard";
+import Landing from "@/pages/landing";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={PremiumHome} />
+      <Route path="/" component={Landing} />
+      <Route path="/home" component={PremiumHome} />
       <Route path="/dashboard" component={PremiumDashboard} />
       <Route path="/subscribe" component={Subscribe} />
       <Route path="/checkout" component={Checkout} />

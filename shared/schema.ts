@@ -72,6 +72,15 @@ export const videos = pgTable("videos", {
   thumbnailUrl: text("thumbnail_url"),
   creditsUsed: integer("credits_used").notNull(),
   visibility: text("visibility").default("team").notNull(), // private, team, public
+  aiModel: text("ai_model").default("kling").notNull(), // kling, hailuo, runway, pika
+  templateId: integer("template_id").references(() => videoTemplates.id),
+  editingData: json("editing_data").$type<{
+    cuts: Array<{ start: number; end: number; }>;
+    filters: Array<{ type: string; intensity: number; }>;
+    music: { url: string; volume: number; };
+    text: Array<{ content: string; position: any; style: any; }>;
+    transitions: Array<{ type: string; duration: number; }>;
+  }>(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -105,6 +114,62 @@ export const teamInvites = pgTable("team_invites", {
   token: text("token").notNull().unique(),
   expiresAt: timestamp("expires_at").notNull(),
   acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const videoTemplates = pgTable("video_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // marketing, education, entertainment, etc.
+  thumbnailUrl: text("thumbnail_url").notNull(),
+  previewUrl: text("preview_url"),
+  prompt: text("prompt").notNull(),
+  duration: integer("duration").notNull(),
+  style: text("style").notNull(),
+  aspectRatio: text("aspect_ratio").notNull(),
+  aiModel: text("ai_model").default("kling").notNull(),
+  isPremium: boolean("is_premium").default(false).notNull(),
+  usageCount: integer("usage_count").default(0).notNull(),
+  rating: integer("rating").default(5).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const aiModels = pgTable("ai_models", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  provider: text("provider").notNull(), // kling, hailuo, runway, pika
+  displayName: text("display_name").notNull(),
+  description: text("description").notNull(),
+  capabilities: json("capabilities").$type<{
+    maxDuration: number;
+    resolutions: string[];
+    styles: string[];
+    aspectRatios: string[];
+    features: string[];
+  }>(),
+  pricing: json("pricing").$type<{
+    creditsPerSecond: number;
+    costPerCredit: number;
+    freeTrialCredits: number;
+  }>(),
+  isActive: boolean("is_active").default(true).notNull(),
+  isPremium: boolean("is_premium").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const videoShowcase = pgTable("video_showcase", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  videoUrl: text("video_url").notNull(),
+  thumbnailUrl: text("thumbnail_url").notNull(),
+  prompt: text("prompt").notNull(),
+  aiModel: text("ai_model").notNull(),
+  category: text("category").notNull(),
+  isFeatured: boolean("is_featured").default(false).notNull(),
+  viewCount: integer("view_count").default(0).notNull(),
+  likeCount: integer("like_count").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -155,6 +220,21 @@ export const insertTeamInviteSchema = createInsertSchema(teamInvites).omit({
   createdAt: true,
 });
 
+export const insertVideoTemplateSchema = createInsertSchema(videoTemplates).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAiModelSchema = createInsertSchema(aiModels).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertVideoShowcaseSchema = createInsertSchema(videoShowcase).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const loginSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1),
@@ -165,6 +245,8 @@ export const videoGenerationSchema = z.object({
   duration: z.number().min(5).max(10), // Kling AI supports 5 or 10 seconds
   style: z.string(),
   aspectRatio: z.string(),
+  aiModel: z.string().default("kling"),
+  templateId: z.number().optional(),
   teamId: z.number().optional(),
   projectId: z.number().optional(),
 });
@@ -208,6 +290,12 @@ export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertTeamInvite = z.infer<typeof insertTeamInviteSchema>;
 export type TeamInvite = typeof teamInvites.$inferSelect;
+export type InsertVideoTemplate = z.infer<typeof insertVideoTemplateSchema>;
+export type VideoTemplate = typeof videoTemplates.$inferSelect;
+export type InsertAiModel = z.infer<typeof insertAiModelSchema>;
+export type AiModel = typeof aiModels.$inferSelect;
+export type InsertVideoShowcase = z.infer<typeof insertVideoShowcaseSchema>;
+export type VideoShowcase = typeof videoShowcase.$inferSelect;
 export type LoginData = z.infer<typeof loginSchema>;
 export type VideoGenerationData = z.infer<typeof videoGenerationSchema>;
 export type TeamCreationData = z.infer<typeof teamCreationSchema>;
