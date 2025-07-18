@@ -82,6 +82,10 @@ attached_assets/
 screenshots/
 uploads/
 
+# UI Component Library (too large for GitHub sharing)
+# client/src/components/ui/
+# Uncomment above line to exclude UI components for smaller repo size
+
 # Server public assets (generated)
 server/public/
 
