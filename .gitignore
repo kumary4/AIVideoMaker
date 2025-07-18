@@ -1,6 +1,91 @@
-node_modules
-dist
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
 .DS_Store
-server/public
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Cache directories
+.cache/
+.parcel-cache/
+.nuxt/
+.next/
+.svelte-kit/
+
+# Vite
 vite.config.ts.*
+dist-ssr/
+
+# Build artifacts
 *.tar.gz
+*.zip
+
+# Replit specific
+.replit
+.replit.nix
+replit.nix
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Attached assets from development (large files)
+attached_assets/
+screenshots/
+uploads/
+
+# Server public assets (generated)
+server/public/
+
+# Package manager lock files (optional - uncomment if you want to exclude)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
